@@ -23,18 +23,36 @@
         <input type="number" id="editIndicesPurple" value="0"><br><br>
 
         <button type="button" onclick="saveValues()">Sauvegarder</button>
+        <button type="button" onclick="returnToMainPage()">Retourner à la page principale</button>
     </form>
-    <button onclick="returnToMainPage()">Retourner à la page principale</button>
 
     <script>
         function saveValues() {
+            localStorage.setItem("weeksRed", document.getElementById("editWeeksRed").value);
+            localStorage.setItem("indicesRed", document.getElementById("editIndicesRed").value);
+            localStorage.setItem("weeksGreen", document.getElementById("editWeeksGreen").value);
+            localStorage.setItem("indicesGreen", document.getElementById("editIndicesGreen").value);
+            localStorage.setItem("weeksPurple", document.getElementById("editWeeksPurple").value);
+            localStorage.setItem("indicesPurple", document.getElementById("editIndicesPurple").value);
+
             alert("Valeurs sauvegardées !");
-            // Logique pour sauvegarder les valeurs
         }
 
         function returnToMainPage() {
+            saveValues();
             window.location.href = "index.html";
         }
+
+        function loadEditValues() {
+            document.getElementById("editWeeksRed").value = localStorage.getItem("weeksRed") || "0";
+            document.getElementById("editIndicesRed").value = localStorage.getItem("indicesRed") || "0";
+            document.getElementById("editWeeksGreen").value = localStorage.getItem("weeksGreen") || "0";
+            document.getElementById("editIndicesGreen").value = localStorage.getItem("indicesGreen") || "0";
+            document.getElementById("editWeeksPurple").value = localStorage.getItem("weeksPurple") || "0";
+            document.getElementById("editIndicesPurple").value = localStorage.getItem("indicesPurple") || "0";
+        }
+
+        window.onload = loadEditValues;
     </script>
 </body>
 </html>
