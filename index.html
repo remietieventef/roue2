@@ -35,8 +35,8 @@
         }
         #wheel-container {
             position: relative;
-            width: 300px;
-            height: 300px;
+            width: 600px;
+            height: 600px;
             margin-top: 20px;
         }
         #wheel {
@@ -51,12 +51,13 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 10px;
-            height: 100px;
+            width: 20px;
+            height: 200px;
             background-color: #333;
             transform-origin: bottom center;
             z-index: 2;
             border-radius: 5px;
+            transform: rotate(0deg); /* Initial rotation */
         }
         #spinButton, #clearHistoryButton {
             margin-top: 20px;
@@ -216,6 +217,7 @@
         function spinRoulette() {
             spinButton.disabled = true;
 
+            // Rotation dans le sens des aiguilles d'une montre
             const randomRotation = Math.floor(Math.random() * 360) + 1440;
             needle.style.transition = "transform 4s ease-out";
             needle.style.transform = `rotate(${randomRotation}deg)`;
@@ -259,3 +261,4 @@
     </script>
 </body>
 </html>
+
