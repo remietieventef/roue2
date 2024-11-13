@@ -42,22 +42,20 @@
         #wheel {
             width: 100%;
             height: 100%;
-            background: url('image.png') no-repeat center center;
+            background: url('Roue_sans_fond.png') no-repeat center center;
             background-size: contain;
             border-radius: 50%;
-            border: 5px solid #333;
+            transition: transform 4s ease-out;
         }
-        #needle {
+        #indicator {
             position: absolute;
+            right: -20px;
             top: 50%;
-            left: 50%;
             width: 20px;
-            height: 200px;
-            background-color: #333;
-            transform-origin: bottom center;
-            z-index: 2;
-            border-radius: 5px;
-            transform: rotate(0deg); /* Initial rotation */
+            height: 20px;
+            background-color: red;
+            clip-path: polygon(100% 50%, 0 0, 0 100%);
+            transform: translateY(-50%);
         }
         #spinButton, #clearHistoryButton {
             margin-top: 20px;
@@ -132,10 +130,10 @@
         <option value="teamPurple">Équipe Violet</option>
     </select>
 
-    <!-- Roue avec l'aiguille tournante au centre -->
+    <!-- Roue avec l'indicateur à droite pour pointer le résultat -->
     <div id="wheel-container">
         <div id="wheel"></div>
-        <div id="needle"></div>
+        <div id="indicator"></div>
     </div>
     <button id="spinButton">Tourner</button>
 
@@ -205,7 +203,7 @@
 
         const segments = ["1 Indice", "1 Buzz", "2 Indices", "2 Buzz", "1 Indice", "1 Buzz", "2 Indices", "2 Buzz"];
         const spinButton = document.getElementById('spinButton');
-        const needle = document.getElementById('needle');
+        const wheel = document.getElementById('wheel');
         const lastAction = document.getElementById('lastAction');
         const teamSelect = document.getElementById('teamSelect');
         const histories = {
@@ -219,8 +217,8 @@
 
             // Rotation dans le sens des aiguilles d'une montre
             const randomRotation = Math.floor(Math.random() * 360) + 1440;
-            needle.style.transition = "transform 4s ease-out";
-            needle.style.transform = `rotate(${randomRotation}deg)`;
+            wheel.style.transition = "transform 4s ease-out";
+            wheel.style.transform = `rotate(${randomRotation}deg)`;
 
             setTimeout(() => {
                 const selectedSegmentIndex = Math.floor(((randomRotation % 360) / 45) + 0.5) % 8;
@@ -261,4 +259,3 @@
     </script>
 </body>
 </html>
-
