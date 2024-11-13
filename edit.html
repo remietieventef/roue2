@@ -6,34 +6,75 @@
 </head>
 <body>
     <h1>Éditer les valeurs des équipes</h1>
-    <form>
-        <label>Équipe Rouge - Nombre de weeks :</label>
-        <input type="number" id="editWeeksRed" value="0"><br>
-        <label>Équipe Rouge - Indices :</label>
-        <input type="number" id="editIndicesRed" value="0"><br><br>
+    <p>Collez les données Excel ici (Nom, Bureau, Date, Statut, Durée) :</p>
+    <textarea id="excelData" rows="10" cols="50" placeholder="Collez ici les données copiées depuis Excel..."></textarea><br><br>
 
-        <label>Équipe Vert - Nombre de weeks :</label>
-        <input type="number" id="editWeeksGreen" value="0"><br>
-        <label>Équipe Vert - Indices :</label>
-        <input type="number" id="editIndicesGreen" value="0"><br><br>
+    <button type="button" onclick="processData()">Calculer les weeks par équipe</button>
+    <button type="button" onclick="saveValues()">Sauvegarder</button>
+    <button type="button" onclick="returnToMainPage()">Retourner à la page principale</button>
 
-        <label>Équipe Violet - Nombre de weeks :</label>
-        <input type="number" id="editWeeksPurple" value="0"><br>
-        <label>Équipe Violet - Indices :</label>
-        <input type="number" id="editIndicesPurple" value="0"><br><br>
-
-        <button type="button" onclick="saveValues()">Sauvegarder</button>
-        <button type="button" onclick="returnToMainPage()">Retourner à la page principale</button>
-    </form>
+    <h2>Résultats par équipe</h2>
+    <ul>
+        <li>Équipe Rouge : <span id="totalWeeksRed">0</span> weeks</li>
+        <li>Équipe Vert : <span id="totalWeeksGreen">0</span> weeks</li>
+        <li>Équipe Violet : <span id="totalWeeksPurple">0</span> weeks</li>
+    </ul>
 
     <script>
+        // Définition des équipes et de leurs membres
+        const teamAssignments = {
+            "Équipe Rouge": ["Adlene Chanegriha", "Margot Guillard"],
+            "Équipe Vert": ["Alexa Coutant", "Maxime Bienne"],
+            "Équipe Violet": ["Elisa Lombe", "Lisa Deroy"]
+        };
+
+        function processData() {
+            const excelText = document.getElementById("excelData").value;
+            const rows = excelText.trim().split("\n");
+            const personWeeks = {};
+
+            // Parcours de chaque ligne pour calculer les weeks par personne
+            rows.forEach(row => {
+                const columns = row.split("\t"); // Diviser par tabulation
+                const fullName = columns[0].trim(); // Colonne "Opportunity Owner: Full Name"
+                const weeks = parseInt(columns[4].trim()); // Colonne "Duration"
+
+                if (!isNaN(weeks)) {
+                    if (personWeeks[fullName]) {
+                        personWeeks[fullName] += weeks;
+                    } else {
+                        personWeeks[fullName] = weeks;
+                    }
+                }
+            });
+
+            // Calcul des weeks par équipe
+            const teamTotals = {
+                "Équipe Rouge": 0,
+                "Équipe Vert": 0,
+                "Équipe Violet": 0
+            };
+
+            for (const person in personWeeks) {
+                for (const team in teamAssignments) {
+                    if (teamAssignments[team].includes(person)) {
+                        teamTotals[team] += personWeeks[person];
+                        break;
+                    }
+                }
+            }
+
+            // Mise à jour des résultats par équipe dans le HTML
+            document.getElementById("totalWeeksRed").textContent = teamTotals["Équipe Rouge"];
+            document.getElementById("totalWeeksGreen").textContent = teamTotals["Équipe Vert"];
+            document.getElementById("totalWeeksPurple").textContent = teamTotals["Équipe Violet"];
+        }
+
         function saveValues() {
-            localStorage.setItem("weeksRed", document.getElementById("editWeeksRed").value);
-            localStorage.setItem("indicesRed", document.getElementById("editIndicesRed").value);
-            localStorage.setItem("weeksGreen", document.getElementById("editWeeksGreen").value);
-            localStorage.setItem("indicesGreen", document.getElementById("editIndicesGreen").value);
-            localStorage.setItem("weeksPurple", document.getElementById("editWeeksPurple").value);
-            localStorage.setItem("indicesPurple", document.getElementById("editIndicesPurple").value);
+            // Sauvegarde des résultats dans le localStorage pour la page principale
+            localStorage.setItem("weeksRed", document.getElementById("totalWeeksRed").textContent);
+            localStorage.setItem("weeksGreen", document.getElementById("totalWeeksGreen").textContent);
+            localStorage.setItem("weeksPurple", document.getElementById("totalWeeksPurple").textContent);
 
             alert("Valeurs sauvegardées !");
         }
@@ -42,17 +83,6 @@
             saveValues();
             window.location.href = "index.html";
         }
-
-        function loadEditValues() {
-            document.getElementById("editWeeksRed").value = localStorage.getItem("weeksRed") || "0";
-            document.getElementById("editIndicesRed").value = localStorage.getItem("indicesRed") || "0";
-            document.getElementById("editWeeksGreen").value = localStorage.getItem("weeksGreen") || "0";
-            document.getElementById("editIndicesGreen").value = localStorage.getItem("indicesGreen") || "0";
-            document.getElementById("editWeeksPurple").value = localStorage.getItem("weeksPurple") || "0";
-            document.getElementById("editIndicesPurple").value = localStorage.getItem("indicesPurple") || "0";
-        }
-
-        window.onload = loadEditValues;
     </script>
 </body>
 </html>
