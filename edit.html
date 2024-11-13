@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Éditer les valeurs</title>
+</head>
+<body>
+    <h1>Éditer les valeurs des équipes</h1>
+    <form>
+        <label>Équipe Rouge - Nombre de weeks :</label>
+        <input type="number" id="editWeeksRed" value="0"><br>
+        <label>Équipe Rouge - Indices :</label>
+        <input type="number" id="editIndicesRed" value="0"><br><br>
+
+        <label>Équipe Vert - Nombre de weeks :</label>
+        <input type="number" id="editWeeksGreen" value="0"><br>
+        <label>Équipe Vert - Indices :</label>
+        <input type="number" id="editIndicesGreen" value="0"><br><br>
+
+        <label>Équipe Violet - Nombre de weeks :</label>
+        <input type="number" id="editWeeksPurple" value="0"><br>
+        <label>Équipe Violet - Indices :</label>
+        <input type="number" id="editIndicesPurple" value="0"><br><br>
+
+        <button type="button" onclick="saveValues()">Sauvegarder</button>
+    </form>
+
+    <script>
+        function saveValues() {
+            // Implémentez ici la sauvegarde des valeurs
+            alert("Valeurs sauvegardées !");
+        }
+    </script>
+</body>
+</html>
