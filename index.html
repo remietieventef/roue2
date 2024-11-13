@@ -20,9 +20,9 @@
         }
         #logo {
             position: absolute;
-            top: 10px;
+            top: 80px; /* Ajusté pour être 2 cm plus bas */
             left: 10px;
-            width: 100px;
+            width: 125px; /* Agrandi de 25% par rapport à 100px */
             z-index: 10;
         }
         #banner {
@@ -45,6 +45,42 @@
         @keyframes scrollBanner {
             0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
+        }
+        #adminButton {
+            position: fixed;
+            top: 50px;
+            right: 20px;
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            font-size: 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 15;
+        }
+        #adminPopup {
+            display: none;
+            position: fixed;
+            top: 100px;
+            right: 30px;
+            width: 200px;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            z-index: 15;
+        }
+        #adminPopup a {
+            display: block;
+            margin: 10px 0;
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        #teamSelect {
+            margin-top: 6cm; /* Positionné 6 cm plus bas */
         }
         #wheel-container {
             position: relative;
@@ -73,7 +109,7 @@
             transform: translateY(-50%);
             z-index: 6;
         }
-        #spinButton, #clearHistoryButton {
+        #spinButton {
             margin-top: 20px;
             padding: 10px 20px;
             font-size: 16px;
@@ -96,12 +132,13 @@
             padding: 10px;
             border-radius: 5px;
             width: 200px;
+            height: 150px; /* Taille fixe pour les bulles d'historique */
             background-color: rgba(255, 255, 255, 0.8);
             display: flex;
             flex-direction: column;
             align-items: center;
             color: #333;
-            z-index: 10;
+            overflow-y: auto;
         }
         .last-action {
             font-size: 1.5em;
@@ -113,26 +150,6 @@
             border-radius: 10px;
             z-index: 10;
         }
-        #stats-table {
-            position: absolute;
-            top: 150px;
-            right: 50px;
-            border: 1px solid #333;
-            padding: 10px;
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 5px;
-            color: #333;
-            z-index: 10;
-        }
-        #stats-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        #stats-table th, #stats-table td {
-            border: 1px solid #333;
-            padding: 5px;
-            text-align: center;
-        }
     </style>
 </head>
 <body>
@@ -141,6 +158,14 @@
 
     <!-- Bannière dynamique -->
     <div id="banner"><span id="bannerText">Bienvenue sur La roulette des secrets !</span></div>
+
+    <!-- Bouton Admin -->
+    <button id="adminButton" onclick="toggleAdminPopup()">Admin</button>
+    <div id="adminPopup">
+        <a href="edit.html" target="_blank">Éditer les valeurs</a>
+        <a href="edit_banner.html" target="_blank">Modifier la bannière</a>
+        <a href="javascript:void(0)" onclick="clearHistory()">Effacer l'historique</a>
+    </div>
 
     <!-- Sélection de l'équipe -->
     <label for="teamSelect">Sélectionnez l'équipe :</label>
@@ -159,9 +184,6 @@
 
     <!-- Dernière action affichée en grand -->
     <div class="last-action" id="lastAction">Dernière action : </div>
-
-    <!-- Bouton pour effacer l'historique -->
-    <button id="clearHistoryButton" onclick="clearHistory()">Effacer l'historique</button>
 
     <!-- Historique des équipes -->
     <div class="team-history">
@@ -182,42 +204,18 @@
         </div>
     </div>
 
-    <!-- Tableau des statistiques -->
-    <div id="stats-table">
-        <table>
-            <tr>
-                <th>Équipe</th>
-                <th>Nombre de weeks</th>
-                <th>Indices</th>
-            </tr>
-            <tr>
-                <td>Équipe Rouge</td>
-                <td id="weeksRed">0</td>
-                <td id="indicesRed">0</td>
-            </tr>
-            <tr>
-                <td>Équipe Vert</td>
-                <td id="weeksGreen">0</td>
-                <td id="indicesGreen">0</td>
-            </tr>
-            <tr>
-                <td>Équipe Violet</td>
-                <td id="weeksPurple">0</td>
-                <td id="indicesPurple">0</td>
-            </tr>
-        </table>
-        <a href="edit.html" target="_blank">Éditer les valeurs</a><br>
-        <a href="edit_banner.html" target="_blank">Modifier la bannière</a>
-    </div>
-
     <script>
-        // Charger la bannière depuis le localStorage
         function loadBanner() {
             const bannerText = localStorage.getItem("bannerText") || "Bienvenue sur La roulette des secrets !";
             document.getElementById("bannerText").textContent = bannerText;
         }
         
         loadBanner();
+
+        function toggleAdminPopup() {
+            const popup = document.getElementById("adminPopup");
+            popup.style.display = popup.style.display === "none" || popup.style.display === "" ? "block" : "none";
+        }
 
         function loadTableValues() {
             document.getElementById("weeksRed").textContent = localStorage.getItem("weeksRed") || "0";
@@ -287,3 +285,4 @@
     </script>
 </body>
 </html>
+
