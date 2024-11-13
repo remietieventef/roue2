@@ -80,13 +80,15 @@
             font-weight: bold;
         }
         #teamSelect {
-            margin-top: 6cm; /* Positionné 6 cm plus bas */
+            margin-top: 4cm; /* Ajusté pour remonter le sélecteur */
+            font-size: 1.5em; /* Double la taille du texte */
+            padding: 10px;
         }
         #wheel-container {
             position: relative;
-            width: 600px;
-            height: 600px;
-            margin-top: 80px; /* Espace pour la bannière */
+            width: 900px; /* Augmentation de 50% par rapport à 600px */
+            height: 900px; /* Augmentation de 50% par rapport à 600px */
+            margin-top: -100px; /* Remonté pour ne pas chevaucher le bouton */
             z-index: 5;
         }
         #wheel {
@@ -285,4 +287,3 @@
     </script>
 </body>
 </html>
-
