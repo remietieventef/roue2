@@ -2,29 +2,121 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modifier la bannière</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+        }
+        #bannerTextInput {
+            width: 100%;
+            max-width: 600px;
+            height: 100px;
+            padding: 10px;
+            font-size: 1.2em;
+        }
+        #optionsContainer {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-direction: column;
+        }
+        #countdownDisplay {
+            font-size: 1.5em;
+            color: red;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        #timeSelector {
+            display: flex;
+            gap: 5px;
+        }
+    </style>
 </head>
 <body>
     <h1>Modifier le texte de la bannière</h1>
-    <textarea id="bannerTextInput" rows="3" cols="50" placeholder="Entrez le texte de la bannière..."></textarea><br><br>
+    
+    <textarea id="bannerTextInput" placeholder="Entrez le texte de la bannière..."></textarea>
+    
+    <div id="optionsContainer">
+        <label>
+            <input type="checkbox" id="countdownCheckbox">
+            Ajouter un décompte
+        </label>
+        <div id="timeSelector" style="display: none;">
+            <label>Heure: <input type="number" id="targetHour" min="0" max="23" value="18"></label>
+            <label>Minutes: <input type="number" id="targetMinute" min="0" max="59" value="0"></label>
+            <label>Secondes: <input type="number" id="targetSecond" min="0" max="59" value="0"></label>
+        </div>
+    </div>
+    
     <button onclick="publishBanner()">Publier</button>
     <button onclick="returnToMainPage()">Retourner à la page principale</button>
 
+    <div id="countdownDisplay" style="display: none;">Temps restant : <span id="countdown"></span></div>
+
     <script>
+        // Fonction pour publier le texte de la bannière
         function publishBanner() {
-            const bannerText = document.getElementById("bannerTextInput").value.trim();
-            if (bannerText) {
-                localStorage.setItem("bannerText", bannerText);
-                alert("Bannière mise à jour !");
-            } else {
-                alert("Le texte de la bannière ne peut pas être vide.");
+            let bannerText = document.getElementById("bannerTextInput").value.trim();
+            const countdownCheckbox = document.getElementById("countdownCheckbox");
+
+            if (countdownCheckbox.checked) {
+                bannerText += " Temps restant : {countdown}";
             }
+
+            localStorage.setItem("bannerText", bannerText);
+            alert("Bannière mise à jour !");
         }
 
+        // Fonction pour retourner à la page principale
         function returnToMainPage() {
             window.location.href = "index.html";
         }
+
+        // Fonction pour calculer le temps restant jusqu'à l'heure définie par l'utilisateur en fuseau horaire de Paris
+        function updateCountdown() {
+            const now = new Date();
+            const timezoneOffset = 60; // Paris (CET) en minutes
+            const parisTime = new Date(now.getTime() + timezoneOffset * 60 * 1000);
+
+            const targetTime = new Date(parisTime);
+            const targetHour = parseInt(document.getElementById("targetHour").value, 10);
+            const targetMinute = parseInt(document.getElementById("targetMinute").value, 10);
+            const targetSecond = parseInt(document.getElementById("targetSecond").value, 10);
+            targetTime.setHours(targetHour, targetMinute, targetSecond, 0);
+
+            if (parisTime > targetTime) {
+                // Si l'heure actuelle est après l'heure cible, prendre l'heure cible du jour suivant
+                targetTime.setDate(targetTime.getDate() + 1);
+            }
+
+            const diff = targetTime - parisTime;
+            const hours = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0');
+            const minutes = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
+            const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
+
+            document.getElementById("countdown").textContent = `${hours}h ${minutes}m ${seconds}s`;
+        }
+
+        // Afficher/Masquer les options de temps et le champ de décompte en fonction du bouton à cocher
+        document.getElementById("countdownCheckbox").addEventListener("change", function () {
+            const countdownDisplay = document.getElementById("countdownDisplay");
+            const timeSelector = document.getElementById("timeSelector");
+            countdownDisplay.style.display = this.checked ? "block" : "none";
+            timeSelector.style.display = this.checked ? "flex" : "none";
+        });
+
+        // Mettre à jour le décompte toutes les secondes si le champ est coché
+        setInterval(() => {
+            if (document.getElementById("countdownCheckbox").checked) {
+                updateCountdown();
+            }
+        }, 1000);
 
         // Charger le texte de la bannière existante dans le champ de texte
         window.onload = function() {
