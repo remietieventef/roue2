@@ -24,11 +24,16 @@
 
         <button type="button" onclick="saveValues()">Sauvegarder</button>
     </form>
+    <button onclick="returnToMainPage()">Retourner à la page principale</button>
 
     <script>
         function saveValues() {
-            // Implémentez ici la sauvegarde des valeurs
             alert("Valeurs sauvegardées !");
+            // Logique pour sauvegarder les valeurs
+        }
+
+        function returnToMainPage() {
+            window.location.href = "index.html";
         }
     </script>
 </body>
