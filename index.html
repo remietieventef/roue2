@@ -92,8 +92,8 @@
             justify-content: center;
             align-items: center;
             width: 675px; /* Taille réduite de 25% par rapport à 900px */
-            height: 675px; /* Taille réduite de 25% par rapport à 900px */
-            margin: 20px auto 0; /* Centrage de la roue */
+            height: 675px;
+            margin: 20px auto 0;
             z-index: 5;
         }
         #wheel {
@@ -261,10 +261,45 @@
 
     <script>
         function loadBanner() {
-            const bannerText = localStorage.getItem("bannerText") || "Bienvenue sur La roulette des secrets !";
+            let bannerText = localStorage.getItem("bannerText") || "Bienvenue sur La roulette des secrets !";
             document.getElementById("bannerText").textContent = bannerText;
+
+            // Vérifie et initialise le compte à rebours si {countdown} est présent
+            if (bannerText.includes("{countdown}")) {
+                const countdownTargetTime = getTargetTime();
+                setInterval(() => updateCountdown(countdownTargetTime), 1000);
+            }
         }
-        
+
+        // Récupère l'heure cible
+        function getTargetTime() {
+            const targetHour = parseInt(localStorage.getItem("targetHour") || "18", 10);
+            const targetMinute = parseInt(localStorage.getItem("targetMinute") || "0", 10);
+            const targetSecond = parseInt(localStorage.getItem("targetSecond") || "0", 10);
+
+            const now = new Date();
+            const targetTime = new Date(now);
+            targetTime.setHours(targetHour, targetMinute, targetSecond, 0);
+
+            if (now > targetTime) {
+                targetTime.setDate(targetTime.getDate() + 1);
+            }
+            return targetTime;
+        }
+
+        // Met à jour le décompte
+        function updateCountdown(targetTime) {
+            const now = new Date();
+            const diff = targetTime - now;
+
+            const hours = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0');
+            const minutes = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
+            const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
+
+            const countdownText = `${hours}h ${minutes}m ${seconds}s`;
+            document.getElementById("bannerText").textContent = localStorage.getItem("bannerText").replace("{countdown}", countdownText);
+        }
+
         loadBanner();
 
         function toggleAdminPopup() {
