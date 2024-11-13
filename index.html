@@ -24,25 +24,36 @@
             left: 10px;
             width: 100px;
         }
-        h1 {
-            font-size: 2em;
-            font-weight: bold;
+        #banner {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: #ff4444;
+            color: #fff;
+            padding: 10px 0;
+            font-size: 1.5em;
             text-align: center;
-            margin: 20px;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 10px;
-            border-radius: 10px;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        #banner span {
+            display: inline-block;
+            animation: scrollBanner 10s linear infinite;
+        }
+        @keyframes scrollBanner {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
         }
         #wheel-container {
             position: relative;
             width: 600px;
             height: 600px;
-            margin-top: 20px;
+            margin-top: 60px; /* Espace pour la bannière */
         }
         #wheel {
             width: 100%;
             height: 100%;
-            background: url('Roue_sans_fond.1.png') no-repeat center center;
+            background: url('Roue_sans_fond.png') no-repeat center center;
             background-size: contain;
             border-radius: 50%;
             transition: transform 4s ease-out;
@@ -119,8 +130,8 @@
     <!-- Logo EF Education First -->
     <img id="logo" src="EF-Logo-Sans-Fond.png" alt="EF Education First Logo">
 
-    <!-- Titre de la roulette -->
-    <h1>La roulette des secrets</h1>
+    <!-- Bannière dynamique -->
+    <div id="banner"><span id="bannerText">Bienvenue sur La roulette des secrets !</span></div>
 
     <!-- Sélection de l'équipe -->
     <label for="teamSelect">Sélectionnez l'équipe :</label>
@@ -186,10 +197,19 @@
                 <td id="indicesPurple">0</td>
             </tr>
         </table>
-        <a href="edit.html" target="_blank">Éditer les valeurs</a>
+        <a href="edit.html" target="_blank">Éditer les valeurs</a><br>
+        <a href="edit_banner.html" target="_blank">Modifier la bannière</a>
     </div>
 
     <script>
+        // Charger la bannière depuis le localStorage
+        function loadBanner() {
+            const bannerText = localStorage.getItem("bannerText") || "Bienvenue sur La roulette des secrets !";
+            document.getElementById("bannerText").textContent = bannerText;
+        }
+        
+        loadBanner();
+
         function loadTableValues() {
             document.getElementById("weeksRed").textContent = localStorage.getItem("weeksRed") || "0";
             document.getElementById("indicesRed").textContent = localStorage.getItem("indicesRed") || "0";
@@ -215,7 +235,6 @@
         function spinRoulette() {
             spinButton.disabled = true;
 
-            // Rotation dans le sens des aiguilles d'une montre
             const randomRotation = Math.floor(Math.random() * 360) + 1440;
             wheel.style.transition = "transform 4s ease-out";
             wheel.style.transform = `rotate(${randomRotation}deg)`;
@@ -259,3 +278,4 @@
     </script>
 </body>
 </html>
+
