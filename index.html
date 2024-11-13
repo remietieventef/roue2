@@ -80,18 +80,20 @@
             font-weight: bold;
         }
         #teamSelectContainer {
-            margin-top: 60px; /* Place le menu déroulant en dessous de la bannière */
+            margin-top: 60px;
             text-align: center;
         }
         #teamSelect {
-            font-size: 1.5em; /* Double la taille du texte */
+            font-size: 1.5em;
             padding: 10px;
         }
         #wheel-container {
-            position: relative;
-            width: 675px; /* Augmentation de 50% par rapport à 600px */
-            height: 675px; /* Augmentation de 50% par rapport à 600px */
-            margin-top: -125px; /* Remonté pour ne pas chevaucher le bouton */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 675px; /* Taille réduite de 25% par rapport à 900px */
+            height: 675px; /* Taille réduite de 25% par rapport à 900px */
+            margin: 20px auto 0; /* Centrage de la roue */
             z-index: 5;
         }
         #wheel {
@@ -137,7 +139,7 @@
             padding: 10px;
             border-radius: 5px;
             width: 200px;
-            height: 150px; /* Taille fixe pour les bulles d'historique */
+            height: 150px;
             background-color: rgba(255, 255, 255, 0.8);
             display: flex;
             flex-direction: column;
@@ -157,7 +159,7 @@
         }
         #stats-table {
             position: absolute;
-            top: 200px; /* Ajusté pour positionner correctement */
+            top: 200px;
             right: 50px;
             border: 1px solid #333;
             padding: 10px;
