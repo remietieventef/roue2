@@ -20,9 +20,9 @@
         }
         #logo {
             position: absolute;
-            top: 80px; /* Ajusté pour être 2 cm plus bas */
+            top: 80px;
             left: 10px;
-            width: 125px; /* Agrandi de 25% par rapport à 100px */
+            width: 125px;
             z-index: 10;
         }
         #banner {
@@ -79,8 +79,11 @@
             color: #333;
             font-weight: bold;
         }
+        #teamSelectContainer {
+            margin-top: 60px; /* Place le menu déroulant en dessous de la bannière */
+            text-align: center;
+        }
         #teamSelect {
-            margin-top: 4cm; /* Ajusté pour remonter le sélecteur */
             font-size: 1.5em; /* Double la taille du texte */
             padding: 10px;
         }
@@ -152,6 +155,26 @@
             border-radius: 10px;
             z-index: 10;
         }
+        #stats-table {
+            position: absolute;
+            top: 200px; /* Ajusté pour positionner correctement */
+            right: 50px;
+            border: 1px solid #333;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            color: #333;
+            z-index: 10;
+        }
+        #stats-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #stats-table th, #stats-table td {
+            border: 1px solid #333;
+            padding: 5px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -169,13 +192,15 @@
         <a href="javascript:void(0)" onclick="clearHistory()">Effacer l'historique</a>
     </div>
 
-    <!-- Sélection de l'équipe -->
-    <label for="teamSelect">Sélectionnez l'équipe :</label>
-    <select id="teamSelect">
-        <option value="teamRed">Équipe Rouge</option>
-        <option value="teamGreen">Équipe Vert</option>
-        <option value="teamPurple">Équipe Violet</option>
-    </select>
+    <!-- Sélection de l'équipe, placé juste en dessous de la bannière -->
+    <div id="teamSelectContainer">
+        <label for="teamSelect">Sélectionnez l'équipe :</label>
+        <select id="teamSelect">
+            <option value="teamRed">Équipe Rouge</option>
+            <option value="teamGreen">Équipe Vert</option>
+            <option value="teamPurple">Équipe Violet</option>
+        </select>
+    </div>
 
     <!-- Roue avec l'indicateur à droite pour pointer le résultat -->
     <div id="wheel-container">
@@ -204,6 +229,32 @@
             <ul class="history" id="historyPurple"></ul>
             <button onclick="showHistory('teamPurple')">Afficher l'historique</button>
         </div>
+    </div>
+
+    <!-- Tableau des statistiques, réintégré sur la droite de la roue -->
+    <div id="stats-table">
+        <table>
+            <tr>
+                <th>Équipe</th>
+                <th>Nombre de weeks</th>
+                <th>Indices</th>
+            </tr>
+            <tr>
+                <td>Équipe Rouge</td>
+                <td id="weeksRed">0</td>
+                <td id="indicesRed">0</td>
+            </tr>
+            <tr>
+                <td>Équipe Vert</td>
+                <td id="weeksGreen">0</td>
+                <td id="indicesGreen">0</td>
+            </tr>
+            <tr>
+                <td>Équipe Violet</td>
+                <td id="weeksPurple">0</td>
+                <td id="indicesPurple">0</td>
+            </tr>
+        </table>
     </div>
 
     <script>
