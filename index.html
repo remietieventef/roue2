@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>La roue des secrets - Jeu d'équipe</title>
+    <title>La roulette des secrets - Jeu d'équipe</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -26,56 +26,49 @@
             font-size: 2em;
             font-weight: bold;
             background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
-            background-clip: text; /* Version standard */
-            -webkit-background-clip: text; /* Version spécifique à WebKit */
+            background-clip: text;
+            -webkit-background-clip: text;
             color: transparent;
             text-align: center;
             margin: 20px;
         }
-        #wheel {
-            position: relative;
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            border: 5px solid #333;
-            overflow: hidden;
+        #roulette-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
         }
-        .segment {
-            position: absolute;
-            width: 150px;
-            height: 300px;
-            background-color: lightblue;
-            transform-origin: 100% 50%;
-            text-align: center;
+        .reel {
+            width: 100px;
+            height: 100px;
+            border: 2px solid #333;
+            border-radius: 5px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            color: #333;
+            font-size: 2em;
+            animation: spin 2s ease-out infinite;
         }
-        .segment:nth-child(1) {
-            background-color: #FFDDC1;
-            transform: rotate(0deg);
+        @keyframes spin {
+            0% { transform: translateY(0); }
+            25% { transform: translateY(-100px); }
+            50% { transform: translateY(-200px); }
+            75% { transform: translateY(-300px); }
+            100% { transform: translateY(0); }
         }
-        .segment:nth-child(2) {
-            background-color: #C1FFD7;
-            transform: rotate(120deg);
-        }
-        .segment:nth-child(3) {
-            background-color: #FFD1DC;
-            transform: rotate(240deg);
-        }
-        #spinButton, #teamSelect {
+        #spinButton {
             margin-top: 20px;
             padding: 10px 20px;
             font-size: 16px;
-        }
-        #spinButton {
             cursor: pointer;
             background-color: #333;
             color: white;
             border: none;
             border-radius: 5px;
+        }
+        .legend {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
         }
         .team-history {
             margin-top: 20px;
@@ -90,6 +83,9 @@
             border-radius: 5px;
             width: 200px;
             background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .team h3 {
             text-align: center;
@@ -98,14 +94,38 @@
             list-style-type: none;
             padding: 0;
         }
+        .last-action {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #333;
+        }
+        #stats-table {
+            position: absolute;
+            top: 150px;
+            right: 50px;
+            border: 1px solid #333;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 5px;
+        }
+        #stats-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #stats-table th, #stats-table td {
+            border: 1px solid #333;
+            padding: 5px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <!-- Logo EF Education First -->
-    <img id="logo" src="https://www.ef.com/__/~/media/universal/efcom/logos/ef-logo-black.png" alt="EF Education First Logo">
+    <img id="logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/EF_Education_First_logo.png" alt="EF Education First Logo">
 
-    <!-- Titre de la board -->
-    <h1>La roue des secrets</h1>
+    <!-- Titre de la roulette -->
+    <h1>La roulette des secrets</h1>
 
     <!-- Sélection de l'équipe -->
     <label for="teamSelect">Sélectionnez l'équipe :</label>
@@ -115,61 +135,142 @@
         <option value="teamPurple">Équipe Violet</option>
     </select>
 
-    <div id="wheel">
-        <div class="segment">Points doublés pendant 3h</div>
-        <div class="segment">-10 points par équipe</div>
-        <div class="segment">Points doublés pendant 3h</div>
+    <!-- Roulette avec trois rouleaux -->
+    <div id="roulette-container">
+        <div class="reel" id="reel1">🍉</div>
+        <div class="reel" id="reel2">🍉</div>
+        <div class="reel" id="reel3">🍉</div>
     </div>
-    <button id="spinButton">Tourner la roue</button>
+    <button id="spinButton">Tourner</button>
+
+    <!-- Dernière action affichée en grand -->
+    <div class="last-action" id="lastAction">Dernière action : </div>
+
+    <!-- Légende des récompenses -->
+    <div class="legend">
+        <p>3 Pasteques : 1 indice</p>
+        <p>2 Pasteques : 20 points</p>
+        <p>5 Pasteques : 60 points</p>
+    </div>
 
     <!-- Historique des équipes -->
     <div class="team-history">
         <div class="team" id="teamRed">
             <h3>Équipe Rouge</h3>
             <ul class="history" id="historyRed"></ul>
+            <button onclick="showHistory('teamRed')">Afficher l'historique</button>
         </div>
         <div class="team" id="teamGreen">
             <h3>Équipe Vert</h3>
             <ul class="history" id="historyGreen"></ul>
+            <button onclick="showHistory('teamGreen')">Afficher l'historique</button>
         </div>
         <div class="team" id="teamPurple">
             <h3>Équipe Violet</h3>
             <ul class="history" id="historyPurple"></ul>
+            <button onclick="showHistory('teamPurple')">Afficher l'historique</button>
         </div>
     </div>
 
+    <!-- Tableau des statistiques -->
+    <div id="stats-table">
+        <table>
+            <tr>
+                <th>Équipe</th>
+                <th>Nombre de weeks</th>
+                <th>Indices</th>
+            </tr>
+            <tr>
+                <td>Équipe Rouge</td>
+                <td id="weeksRed">0</td>
+                <td id="indicesRed">0</td>
+            </tr>
+            <tr>
+                <td>Équipe Vert</td>
+                <td id="weeksGreen">0</td>
+                <td id="indicesGreen">0</td>
+            </tr>
+            <tr>
+                <td>Équipe Violet</td>
+                <td id="weeksPurple">0</td>
+                <td id="indicesPurple">0</td>
+            </tr>
+        </table>
+        <a href="edit.html" target="_blank">Éditer les valeurs</a>
+    </div>
+
     <script>
-        const wheel = document.getElementById('wheel');
+        const reels = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
         const spinButton = document.getElementById('spinButton');
+        const lastAction = document.getElementById('lastAction');
         const teamSelect = document.getElementById('teamSelect');
-        const options = ["Points doublés pendant 3h", "-10 points par équipe"];
-        
         const histories = {
             teamRed: document.getElementById('historyRed'),
             teamGreen: document.getElementById('historyGreen'),
             teamPurple: document.getElementById('historyPurple')
         };
 
-        function spinWheel() {
-            const randomRotation = Math.floor(Math.random() * 360) + 1440; // 1440° pour plusieurs tours
-            wheel.style.transition = "transform 4s ease-out";
-            wheel.style.transform = `rotate(${randomRotation}deg)`;
+        const outcomes = ["🍉", "🍋", "🍒"];
 
+        function getRandomOutcome() {
+            return outcomes[Math.floor(Math.random() * outcomes.length)];
+        }
+
+        function spinRoulette() {
+            spinButton.disabled = true;
+
+            // Faire tourner chaque rouleau
+            reels.forEach((reel, index) => {
+                reel.style.animation = `spin 0.5s ease-out ${index * 0.2}s`;
+                setTimeout(() => {
+                    reel.textContent = getRandomOutcome();
+                }, 500 + index * 200);
+            });
+
+            // Afficher le résultat après la rotation
             setTimeout(() => {
-                const selectedIndex = Math.floor((randomRotation % 360) / 120);
-                const result = options[selectedIndex];
+                const result = reels.map(reel => reel.textContent);
+                const pastequesCount = result.filter(symbol => symbol === "🍉").length;
+                let message = "";
+
+                if (pastequesCount === 3) {
+                    message = "3 Pasteques : 1 indice";
+                } else if (pastequesCount === 2) {
+                    message = "2 Pasteques : 20 points";
+                } else if (pastequesCount === 5) {
+                    message = "5 Pasteques : 60 points";
+                } else {
+                    message = "Aucun gain";
+                }
+
                 const selectedTeam = teamSelect.value;
 
                 // Ajouter le résultat à l'historique de l'équipe sélectionnée
                 const listItem = document.createElement('li');
-                listItem.textContent = result;
+                listItem.textContent = message;
                 histories[selectedTeam].appendChild(listItem);
 
-                alert(`Résultat pour ${selectedTeam}: ${result}`);
-            }, 4000); // Temps de rotation
+                // Mettre à jour l'affichage de la dernière action
+                lastAction.textContent = `Dernière action : ${message}`;
+
+                alert(`Résultat pour ${selectedTeam}: ${message}`);
+
+                spinButton.disabled = false; // Réactiver le bouton
+            }, 1500);
         }
 
-        spinButton.addEventListener('click', spinWheel);
+        spinButton.addEventListener('click', spinRoulette);
+
+        // Fonction pour afficher l'historique d'une équipe
+        function showHistory(team) {
+            const history = histories[team];
+            let historyText = "Historique:\n";
+            history.querySelectorAll("li").forEach(item => {
+                historyText += `- ${item.textContent}\n`;
+            });
+            alert(historyText);
+        }
     </script>
 </body>
 </html>
+
