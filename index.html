@@ -42,36 +42,10 @@
         #wheel {
             width: 100%;
             height: 100%;
+            background: url('image.png') no-repeat center center;
+            background-size: contain;
             border-radius: 50%;
             border: 5px solid #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            overflow: hidden;
-        }
-        .segment {
-            position: absolute;
-            width: 50%;
-            height: 50%;
-            transform-origin: 100% 50%;
-            text-align: center;
-            font-weight: bold;
-            color: #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .segment:nth-child(1) { background-color: #FFDDC1; transform: rotate(0deg) skewY(-45deg); }
-        .segment:nth-child(2) { background-color: #FFB6C1; transform: rotate(45deg) skewY(-45deg); }
-        .segment:nth-child(3) { background-color: #FFDDC1; transform: rotate(90deg) skewY(-45deg); }
-        .segment:nth-child(4) { background-color: #FFB6C1; transform: rotate(135deg) skewY(-45deg); }
-        .segment:nth-child(5) { background-color: #FFDDC1; transform: rotate(180deg) skewY(-45deg); }
-        .segment:nth-child(6) { background-color: #FFB6C1; transform: rotate(225deg) skewY(-45deg); }
-        .segment:nth-child(7) { background-color: #FFDDC1; transform: rotate(270deg) skewY(-45deg); }
-        .segment:nth-child(8) { background-color: #FFB6C1; transform: rotate(315deg) skewY(-45deg); }
-        #wheel .segment span {
-            transform: skewY(45deg) rotate(-22.5deg);
         }
         #needle {
             position: absolute;
@@ -82,6 +56,7 @@
             background-color: #333;
             transform-origin: bottom center;
             z-index: 2;
+            border-radius: 5px;
         }
         #spinButton, #clearHistoryButton {
             margin-top: 20px;
@@ -156,18 +131,9 @@
         <option value="teamPurple">Équipe Violet</option>
     </select>
 
-    <!-- Roue avec l'aiguille au centre -->
+    <!-- Roue avec l'aiguille tournante au centre -->
     <div id="wheel-container">
-        <div id="wheel">
-            <div class="segment"><span>1 Indice</span></div>
-            <div class="segment"><span>1 Buzz</span></div>
-            <div class="segment"><span>2 Indices</span></div>
-            <div class="segment"><span>2 Buzz</span></div>
-            <div class="segment"><span>1 Indice</span></div>
-            <div class="segment"><span>1 Buzz</span></div>
-            <div class="segment"><span>2 Indices</span></div>
-            <div class="segment"><span>2 Buzz</span></div>
-        </div>
+        <div id="wheel"></div>
         <div id="needle"></div>
     </div>
     <button id="spinButton">Tourner</button>
