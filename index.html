@@ -33,30 +33,55 @@
             padding: 10px;
             border-radius: 10px;
         }
-        #roulette-container {
-            display: flex;
-            gap: 10px;
+        #wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
             margin-top: 20px;
         }
-        .reel {
-            width: 100px;
-            height: 100px;
-            border: 2px solid #333;
-            border-radius: 5px;
+        #wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 5px solid #333;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2em;
-            background-color: #fff;
-            color: #333;
-            animation: spin 2s ease-out infinite;
+            position: absolute;
+            overflow: hidden;
         }
-        @keyframes spin {
-            0% { transform: translateY(0); }
-            25% { transform: translateY(-100px); }
-            50% { transform: translateY(-200px); }
-            75% { transform: translateY(-300px); }
-            100% { transform: translateY(0); }
+        .segment {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: 100% 50%;
+            text-align: center;
+            font-weight: bold;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .segment:nth-child(1) { background-color: #FFDDC1; transform: rotate(0deg) skewY(-45deg); }
+        .segment:nth-child(2) { background-color: #FFB6C1; transform: rotate(45deg) skewY(-45deg); }
+        .segment:nth-child(3) { background-color: #FFDDC1; transform: rotate(90deg) skewY(-45deg); }
+        .segment:nth-child(4) { background-color: #FFB6C1; transform: rotate(135deg) skewY(-45deg); }
+        .segment:nth-child(5) { background-color: #FFDDC1; transform: rotate(180deg) skewY(-45deg); }
+        .segment:nth-child(6) { background-color: #FFB6C1; transform: rotate(225deg) skewY(-45deg); }
+        .segment:nth-child(7) { background-color: #FFDDC1; transform: rotate(270deg) skewY(-45deg); }
+        .segment:nth-child(8) { background-color: #FFB6C1; transform: rotate(315deg) skewY(-45deg); }
+        #wheel .segment span {
+            transform: skewY(45deg) rotate(-22.5deg);
+        }
+        #needle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 10px;
+            height: 100px;
+            background-color: #333;
+            transform-origin: bottom center;
+            z-index: 2;
         }
         #spinButton, #clearHistoryButton {
             margin-top: 20px;
@@ -67,14 +92,6 @@
             color: white;
             border: none;
             border-radius: 5px;
-        }
-        .legend {
-            margin-top: 20px;
-            text-align: center;
-            font-weight: bold;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 10px;
-            border-radius: 10px;
         }
         .team-history {
             margin-top: 20px;
@@ -139,11 +156,19 @@
         <option value="teamPurple">Équipe Violet</option>
     </select>
 
-    <!-- Roulette avec trois rouleaux -->
-    <div id="roulette-container">
-        <div class="reel" id="reel1">🍉</div>
-        <div class="reel" id="reel2">🍉</div>
-        <div class="reel" id="reel3">🍉</div>
+    <!-- Roue avec l'aiguille au centre -->
+    <div id="wheel-container">
+        <div id="wheel">
+            <div class="segment"><span>1 Indice</span></div>
+            <div class="segment"><span>1 Buzz</span></div>
+            <div class="segment"><span>2 Indices</span></div>
+            <div class="segment"><span>2 Buzz</span></div>
+            <div class="segment"><span>1 Indice</span></div>
+            <div class="segment"><span>1 Buzz</span></div>
+            <div class="segment"><span>2 Indices</span></div>
+            <div class="segment"><span>2 Buzz</span></div>
+        </div>
+        <div id="needle"></div>
     </div>
     <button id="spinButton">Tourner</button>
 
@@ -152,13 +177,6 @@
 
     <!-- Bouton pour effacer l'historique -->
     <button id="clearHistoryButton" onclick="clearHistory()">Effacer l'historique</button>
-
-    <!-- Légende des récompenses -->
-    <div class="legend">
-        <p>3 Pasteques : 1 indice</p>
-        <p>2 Pasteques : 20 points</p>
-        <p>5 Pasteques : 60 points</p>
-    </div>
 
     <!-- Historique des équipes -->
     <div class="team-history">
@@ -218,8 +236,9 @@
 
         window.onload = loadTableValues;
 
-        const reels = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
+        const segments = ["1 Indice", "1 Buzz", "2 Indices", "2 Buzz", "1 Indice", "1 Buzz", "2 Indices", "2 Buzz"];
         const spinButton = document.getElementById('spinButton');
+        const needle = document.getElementById('needle');
         const lastAction = document.getElementById('lastAction');
         const teamSelect = document.getElementById('teamSelect');
         const histories = {
@@ -228,49 +247,29 @@
             teamPurple: document.getElementById('historyPurple')
         };
 
-        const outcomes = ["🍉", "🍋", "🍒"];
-
-        function getRandomOutcome() {
-            return outcomes[Math.floor(Math.random() * outcomes.length)];
-        }
-
         function spinRoulette() {
             spinButton.disabled = true;
 
-            reels.forEach((reel, index) => {
-                reel.style.animation = `spin 0.5s ease-out ${index * 0.2}s`;
-                setTimeout(() => {
-                    reel.textContent = getRandomOutcome();
-                }, 500 + index * 200);
-            });
+            const randomRotation = Math.floor(Math.random() * 360) + 1440;
+            needle.style.transition = "transform 4s ease-out";
+            needle.style.transform = `rotate(${randomRotation}deg)`;
 
             setTimeout(() => {
-                const result = reels.map(reel => reel.textContent);
-                const pastequesCount = result.filter(symbol => symbol === "🍉").length;
-                let message = "";
-
-                if (pastequesCount === 3) {
-                    message = "3 Pasteques : 1 indice";
-                } else if (pastequesCount === 2) {
-                    message = "2 Pasteques : 20 points";
-                } else if (pastequesCount === 5) {
-                    message = "5 Pasteques : 60 points";
-                } else {
-                    message = "Aucun gain";
-                }
+                const selectedSegmentIndex = Math.floor(((randomRotation % 360) / 45) + 0.5) % 8;
+                const result = segments[selectedSegmentIndex];
 
                 const selectedTeam = teamSelect.value;
 
                 const listItem = document.createElement('li');
-                listItem.textContent = message;
+                listItem.textContent = result;
                 histories[selectedTeam].appendChild(listItem);
 
-                lastAction.textContent = `Dernière action : ${message}`;
+                lastAction.textContent = `Dernière action : ${result}`;
 
-                alert(`Résultat pour ${selectedTeam}: ${message}`);
+                alert(`Résultat pour ${selectedTeam}: ${result}`);
 
                 spinButton.disabled = false;
-            }, 1500);
+            }, 4000);
         }
 
         spinButton.addEventListener('click', spinRoulette);
