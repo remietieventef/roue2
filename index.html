@@ -87,11 +87,41 @@
             font-size: 1.5em;
             padding: 10px;
         }
+        /* Classement */
+        #ranking {
+            position: absolute;
+            left: 20px;
+            top: 150px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            width: 150px;
+            z-index: 10;
+            animation: popUp 1s ease-out;
+        }
+        #ranking h2 {
+            font-size: 1.2em;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .rank-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .rank-item span {
+            margin-left: 10px;
+        }
+        @keyframes popUp {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
         #wheel-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 675px; 
+            width: 675px; /* Taille réduite de 25% par rapport à 900px */
             height: 675px;
             margin: 20px auto 0;
             z-index: 5;
@@ -127,38 +157,55 @@
             border-radius: 5px;
             z-index: 10;
         }
-        /* Classement en temps réel */
-        #ranking {
-            position: absolute;
-            left: 10px;
-            top: 200px;
-            width: 200px;
-            padding: 15px;
-            background-color: rgba(0, 0, 0, 0.7);
-            border-radius: 5px;
-            color: #fff;
-            text-align: left;
-            font-size: 1.2em;
-            z-index: 10;
-            animation: slideIn 1s ease;
-        }
-        @keyframes slideIn {
-            from { transform: translateX(-100%); }
-            to { transform: translateX(0); }
-        }
-        .rank-item {
-            margin: 10px 0;
+        .team-history {
+            margin-top: 20px;
             display: flex;
+            gap: 20px;
+            width: 100%;
+            justify-content: center;
+        }
+        .team {
+            border: 1px solid #333;
+            padding: 10px;
+            border-radius: 5px;
+            width: 200px;
+            height: 150px;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: space-between;
+            color: #333;
+            overflow-y: auto;
         }
-        .emoji {
+        .last-action {
             font-size: 1.5em;
-            animation: bounce 1s infinite alternate;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #333;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 10px;
+            z-index: 10;
         }
-        @keyframes bounce {
-            from { transform: translateY(0); }
-            to { transform: translateY(-5px); }
+        #stats-table {
+            position: absolute;
+            top: 200px;
+            right: 50px;
+            border: 1px solid #333;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            color: #333;
+            z-index: 10;
+        }
+        #stats-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #stats-table th, #stats-table td {
+            border: 1px solid #333;
+            padding: 5px;
+            text-align: center;
         }
     </style>
 </head>
@@ -169,20 +216,20 @@
     <!-- Bannière dynamique -->
     <div id="banner"><span id="bannerText">Bienvenue sur La roulette des secrets !</span></div>
 
+    <!-- Classement -->
+    <div id="ranking">
+        <h2>Classement 🎉</h2>
+        <div id="rankingList">
+            <!-- Les équipes seront affichées ici -->
+        </div>
+    </div>
+
     <!-- Bouton Admin -->
     <button id="adminButton" onclick="toggleAdminPopup()">Admin</button>
     <div id="adminPopup">
         <a href="edit.html" target="_blank">Éditer les valeurs</a>
         <a href="edit_banner.html" target="_blank">Modifier la bannière</a>
         <a href="javascript:void(0)" onclick="clearHistory()">Effacer l'historique</a>
-    </div>
-
-    <!-- Classement en temps réel -->
-    <div id="ranking">
-        <h3>Classement</h3>
-        <div id="rankList">
-            <!-- Les éléments de classement apparaîtront ici -->
-        </div>
     </div>
 
     <!-- Sélection de l'équipe, placé juste en dessous de la bannière -->
@@ -251,33 +298,50 @@
     </div>
 
     <script>
-        // Récupération des données et classement en temps réel
-        function updateRanking() {
-            const teams = [
-                { name: "Équipe Rouge", score: parseInt(localStorage.getItem("weeksRed") || 0), emoji: "🔴" },
-                { name: "Équipe Vert", score: parseInt(localStorage.getItem("weeksGreen") || 0), emoji: "🟢" },
-                { name: "Équipe Violet", score: parseInt(localStorage.getItem("weeksPurple") || 0), emoji: "🟣" }
-            ];
+        function loadBanner() {
+            let bannerText = localStorage.getItem("bannerText") || "Bienvenue sur La roulette des secrets !";
+            document.getElementById("bannerText").textContent = bannerText;
 
-            teams.sort((a, b) => b.score - a.score);
-            
-            const rankList = document.getElementById("rankList");
-            rankList.innerHTML = ""; // Clear existing rankings
-            
-            teams.forEach(team => {
-                const rankItem = document.createElement("div");
-                rankItem.classList.add("rank-item");
-                rankItem.innerHTML = `${team.emoji} ${team.name} <span class="emoji">${team.score}</span>`;
-                rankList.appendChild(rankItem);
-            });
+            if (bannerText.includes("{countdown}")) {
+                const countdownTargetTime = getTargetTime();
+                setInterval(() => updateCountdown(countdownTargetTime), 1000);
+            }
         }
 
-        // Update ranking on page load and whenever a score changes
-        window.onload = () => {
-            loadTableValues();
-            updateRanking();
-        };
-        
+        function getTargetTime() {
+            const targetHour = parseInt(localStorage.getItem("targetHour") || "18", 10);
+            const targetMinute = parseInt(localStorage.getItem("targetMinute") || "0", 10);
+            const targetSecond = parseInt(localStorage.getItem("targetSecond") || "0", 10);
+
+            const now = new Date();
+            const targetTime = new Date(now);
+            targetTime.setHours(targetHour, targetMinute, targetSecond, 0);
+
+            if (now > targetTime) {
+                targetTime.setDate(targetTime.getDate() + 1);
+            }
+            return targetTime;
+        }
+
+        function updateCountdown(targetTime) {
+            const now = new Date();
+            const diff = targetTime - now;
+
+            const hours = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0');
+            const minutes = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
+            const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
+
+            const countdownText = `${hours}h ${minutes}m ${seconds}s`;
+            document.getElementById("bannerText").textContent = localStorage.getItem("bannerText").replace("{countdown}", countdownText);
+        }
+
+        loadBanner();
+
+        function toggleAdminPopup() {
+            const popup = document.getElementById("adminPopup");
+            popup.style.display = popup.style.display === "none" || popup.style.display === "" ? "block" : "none";
+        }
+
         function loadTableValues() {
             document.getElementById("weeksRed").textContent = localStorage.getItem("weeksRed") || "0";
             document.getElementById("indicesRed").textContent = localStorage.getItem("indicesRed") || "0";
@@ -285,6 +349,87 @@
             document.getElementById("indicesGreen").textContent = localStorage.getItem("indicesGreen") || "0";
             document.getElementById("weeksPurple").textContent = localStorage.getItem("weeksPurple") || "0";
             document.getElementById("indicesPurple").textContent = localStorage.getItem("indicesPurple") || "0";
+            updateRanking(); // Met à jour le classement dès le chargement
+        }
+
+        window.onload = loadTableValues;
+
+        const segments = ["1 Indice", "1 Buzz", "2 Indices", "2 Buzz", "1 Indice", "1 Buzz", "2 Indices", "2 Buzz"];
+        const spinButton = document.getElementById('spinButton');
+        const wheel = document.getElementById('wheel');
+        const lastAction = document.getElementById('lastAction');
+        const teamSelect = document.getElementById('teamSelect');
+        const histories = {
+            teamRed: document.getElementById('historyRed'),
+            teamGreen: document.getElementById('historyGreen'),
+            teamPurple: document.getElementById('historyPurple')
+        };
+
+        function spinRoulette() {
+            spinButton.disabled = true;
+
+            const randomRotation = Math.floor(Math.random() * 360) + 1440;
+            wheel.style.transition = "transform 4s ease-out";
+            wheel.style.transform = `rotate(${randomRotation}deg)`;
+
+            setTimeout(() => {
+                const selectedSegmentIndex = Math.floor(((randomRotation % 360) / 45) + 0.5) % 8;
+                const result = segments[selectedSegmentIndex];
+
+                const selectedTeam = teamSelect.value;
+
+                const listItem = document.createElement('li');
+                listItem.textContent = result;
+                histories[selectedTeam].appendChild(listItem);
+
+                lastAction.textContent = `Dernière action : ${result}`;
+
+                alert(`Résultat pour ${selectedTeam}: ${result}`);
+
+                spinButton.disabled = false;
+                updateRanking(); // Met à jour le classement après chaque action
+            }, 4000);
+        }
+
+        spinButton.addEventListener('click', spinRoulette);
+
+        function showHistory(team) {
+            const history = histories[team];
+            let historyText = "Historique:\n";
+            history.querySelectorAll("li").forEach(item => {
+                historyText += `- ${item.textContent}\n`;
+            });
+            alert(historyText);
+        }
+
+        function clearHistory() {
+            for (let key in histories) {
+                histories[key].innerHTML = "";
+            }
+            lastAction.textContent = "Dernière action : ";
+            alert("Historique effacé !");
+            updateRanking(); // Met à jour le classement après effacement
+        }
+
+        // Classement
+        function updateRanking() {
+            const teams = [
+                { name: 'Équipe Rouge', points: parseInt(localStorage.getItem('indicesRed') || '0'), emoji: '🔥' },
+                { name: 'Équipe Vert', points: parseInt(localStorage.getItem('indicesGreen') || '0'), emoji: '🌿' },
+                { name: 'Équipe Violet', points: parseInt(localStorage.getItem('indicesPurple') || '0'), emoji: '💜' }
+            ];
+
+            teams.sort((a, b) => b.points - a.points); // Tri par score
+
+            const rankingList = document.getElementById('rankingList');
+            rankingList.innerHTML = ''; // Réinitialise la liste
+
+            teams.forEach((team, index) => {
+                const rankItem = document.createElement('div');
+                rankItem.className = 'rank-item';
+                rankItem.innerHTML = `${index + 1}. ${team.emoji} ${team.name} <span>${team.points} pts</span>`;
+                rankingList.appendChild(rankItem);
+            });
         }
     </script>
 </body>
