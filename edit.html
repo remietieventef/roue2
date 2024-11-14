@@ -38,6 +38,14 @@
             color: #888;
             font-size: 0.8em;
         }
+        .bubble {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
@@ -46,9 +54,12 @@
         <p>Collez les données Excel ici (Nom, Bureau, Date, Statut, Durée) :</p>
         <textarea id="excelData" rows="10" cols="50" placeholder="Collez ici les données copiées depuis Excel..."></textarea><br><br>
 
-        <button type="button" onclick="processData()">Calculer les weeks par équipe</button>
-        <button type="button" onclick="saveValues()">Sauvegarder</button>
-        <button type="button" onclick="returnToMainPage()">Retourner à la page principale</button>
+        <!-- Bulle 1 : Boutons pour calculer, sauvegarder et retourner -->
+        <div class="bubble">
+            <button type="button" onclick="processData()">Calculer les weeks par équipe</button>
+            <button type="button" onclick="saveValues()">Sauvegarder</button>
+            <button type="button" onclick="returnToMainPage()">Retourner à la page principale</button>
+        </div>
 
         <h2>Résultats par équipe</h2>
         <ul>
@@ -57,25 +68,31 @@
             <li>Équipe Violet : <span id="totalWeeksPurple">0</span> weeks</li>
         </ul>
 
-        <!-- Formulaire pour modifier les indices -->
-        <h2>Modifier la colonne Indices</h2>
-        <label for="teamSelect">Sélectionnez l'équipe :</label>
-        <select id="teamSelect">
-            <option value="teamRed">Équipe Rouge</option>
-            <option value="teamGreen">Équipe Vert</option>
-            <option value="teamPurple">Équipe Violet</option>
-        </select>
-        
-        <label for="newIndices">Nouvelle valeur d'Indices :</label>
-        <input type="number" id="newIndices" placeholder="Entrez une nouvelle valeur d'Indices">
-        <button onclick="updateIndices()">Mettre à jour les Indices</button>
+        <!-- Bulle 2 : Formulaire pour modifier les indices avec bouton de retour -->
+        <div class="bubble">
+            <label for="teamSelect">Sélectionnez l'équipe :</label>
+            <select id="teamSelect">
+                <option value="teamRed">Équipe Rouge</option>
+                <option value="teamGreen">Équipe Vert</option>
+                <option value="teamPurple">Équipe Violet</option>
+            </select>
+            <label for="newIndices">Nouvelle valeur d'Indices :</label>
+            <input type="number" id="newIndices" placeholder="Entrez une nouvelle valeur d'Indices">
+            <button onclick="updateIndices()">Mettre à jour les Indices</button>
+            <button type="button" onclick="returnToMainPage()">Retourner à la page principale</button>
+        </div>
+
+        <!-- Bulle 3 : Suppression de l'historique avec validation de mot de passe -->
+        <div class="bubble">
+            <input type="password" id="deletePassword" placeholder="Mot de passe">
+            <button onclick="deleteHistory()">Supprimer l'historique</button>
+        </div>
     </div>
 
     <!-- Section Historique sur la droite -->
     <div class="history-section">
         <h2>Historique des dernières actions</h2>
 
-        <!-- Historique des 10 dernières données Excel importées -->
         <div>
             <h3>Dernières données Excel importées</h3>
             <ul id="excelHistory" class="history-list">
@@ -83,7 +100,6 @@
             </ul>
         </div>
 
-        <!-- Historique des Résultats par équipe -->
         <div>
             <h3>Historique Résultats par équipe</h3>
             <ul id="rankingHistory" class="history-list">
@@ -91,7 +107,6 @@
             </ul>
         </div>
 
-        <!-- Historique des 10 dernières mises à jour des Indices -->
         <div>
             <h3>Dernières mises à jour des Indices</h3>
             <ul id="indicesUpdateHistory" class="history-list">
@@ -101,7 +116,6 @@
     </div>
 
     <script>
-        // Définition des équipes et de leurs membres
         const teamAssignments = {
             "Équipe Rouge": ["Adlene Chanegriha", "Margot Guillard"],
             "Équipe Vert": ["Alexa Coutant", "Maxime Bienne"],
@@ -119,11 +133,7 @@
                 const weeks = parseInt(columns[4].trim());
 
                 if (!isNaN(weeks)) {
-                    if (personWeeks[fullName]) {
-                        personWeeks[fullName] += weeks;
-                    } else {
-                        personWeeks[fullName] = weeks;
-                    }
+                    personWeeks[fullName] = (personWeeks[fullName] || 0) + weeks;
                 }
             });
 
@@ -146,8 +156,8 @@
             document.getElementById("totalWeeksGreen").textContent = teamTotals["Équipe Vert"];
             document.getElementById("totalWeeksPurple").textContent = teamTotals["Équipe Violet"];
 
-            saveExcelHistory(excelText); // Enregistre dans l'historique
-            saveRankingHistory(teamTotals); // Enregistre le résultat par équipe dans l'historique
+            saveExcelHistory(excelText);
+            saveRankingHistory(teamTotals);
         }
 
         function saveValues() {
@@ -175,6 +185,19 @@
             alert(`Les Indices pour ${team} ont été mis à jour à ${newIndicesValue}.`);
             saveIndicesUpdateHistory(`${team} mis à jour à ${newIndicesValue} Indices`);
             loadIndicesUpdateHistory();
+        }
+
+        function deleteHistory() {
+            const password = document.getElementById("deletePassword").value;
+            if (password === "WeLoveILSY") {
+                localStorage.removeItem("excelHistory");
+                localStorage.removeItem("rankingHistory");
+                localStorage.removeItem("indicesUpdateHistory");
+                alert("Historique supprimé !");
+                loadHistories();
+            } else {
+                alert("Mot de passe incorrect !");
+            }
         }
 
         function saveExcelHistory(data) {
