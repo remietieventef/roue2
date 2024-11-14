@@ -2,42 +2,24 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Éditer les Valeurs - La roulette des secrets</title>
+    <title>Éditer les valeurs</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: space-between;
-            margin: 0;
             padding: 20px;
-            background-color: #f4f4f9;
-            color: #333;
         }
         .container {
-            display: flex;
-            flex-direction: column;
             width: 60%;
-        }
-        .form-section, .history-section {
-            margin-bottom: 20px;
-        }
-        label, input, button {
-            display: block;
-            margin-bottom: 10px;
         }
         .history-section {
             width: 35%;
             max-width: 400px;
-            background-color: #fff;
+            background-color: #f4f4f9;
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            font-size: 1.5em;
-            margin-bottom: 10px;
-            color: #444;
         }
         .history-list {
             list-style-type: none;
@@ -53,23 +35,33 @@
 </head>
 <body>
     <div class="container">
-        <!-- Formulaire de modification de la colonne Indices -->
-        <div class="form-section">
-            <h2>Modifier la colonne Indices</h2>
-            <label for="teamSelect">Sélectionnez l'équipe :</label>
-            <select id="teamSelect">
-                <option value="teamRed">Équipe Rouge</option>
-                <option value="teamGreen">Équipe Vert</option>
-                <option value="teamPurple">Équipe Violet</option>
-            </select>
-            
-            <label for="newIndices">Nouvelle valeur d'Indices :</label>
-            <input type="number" id="newIndices" placeholder="Entrez une nouvelle valeur d'Indices">
+        <h1>Éditer les valeurs des équipes</h1>
+        <p>Collez les données Excel ici (Nom, Bureau, Date, Statut, Durée) :</p>
+        <textarea id="excelData" rows="10" cols="50" placeholder="Collez ici les données copiées depuis Excel..."></textarea><br><br>
 
-            <button onclick="updateIndices()">Mettre à jour les Indices</button>
-        </div>
+        <button type="button" onclick="processData()">Calculer les weeks par équipe</button>
+        <button type="button" onclick="saveValues()">Sauvegarder</button>
+        <button type="button" onclick="returnToMainPage()">Retourner à la page principale</button>
 
-        <!-- Autres éléments ou formulaires existants (si présents) -->
+        <h2>Résultats par équipe</h2>
+        <ul>
+            <li>Équipe Rouge : <span id="totalWeeksRed">0</span> weeks</li>
+            <li>Équipe Vert : <span id="totalWeeksGreen">0</span> weeks</li>
+            <li>Équipe Violet : <span id="totalWeeksPurple">0</span> weeks</li>
+        </ul>
+
+        <!-- Formulaire pour modifier les indices -->
+        <h2>Modifier la colonne Indices</h2>
+        <label for="teamSelect">Sélectionnez l'équipe :</label>
+        <select id="teamSelect">
+            <option value="teamRed">Équipe Rouge</option>
+            <option value="teamGreen">Équipe Vert</option>
+            <option value="teamPurple">Équipe Violet</option>
+        </select>
+        
+        <label for="newIndices">Nouvelle valeur d'Indices :</label>
+        <input type="number" id="newIndices" placeholder="Entrez une nouvelle valeur d'Indices">
+        <button onclick="updateIndices()">Mettre à jour les Indices</button>
     </div>
 
     <!-- Section Historique sur la droite -->
@@ -102,58 +94,66 @@
     </div>
 
     <script>
-        // Charger les historiques depuis localStorage
-        window.onload = loadHistories;
+        // Définition des équipes et de leurs membres
+        const teamAssignments = {
+            "Équipe Rouge": ["Adlene Chanegriha", "Margot Guillard"],
+            "Équipe Vert": ["Alexa Coutant", "Maxime Bienne"],
+            "Équipe Violet": ["Elisa Lombe", "Lisa Deroy"]
+        };
 
-        function loadHistories() {
-            loadExcelHistory();
-            loadRankingHistory();
-            loadIndicesUpdateHistory();
-        }
+        function processData() {
+            const excelText = document.getElementById("excelData").value;
+            const rows = excelText.trim().split("\n");
+            const personWeeks = {};
 
-        // Historique des 10 dernières données Excel importées
-        function loadExcelHistory() {
-            const excelHistory = JSON.parse(localStorage.getItem("excelHistory") || "[]");
-            const excelList = document.getElementById("excelHistory");
-            excelList.innerHTML = ""; // Vider la liste existante
+            rows.forEach(row => {
+                const columns = row.split("\t");
+                const fullName = columns[0].trim();
+                const weeks = parseInt(columns[4].trim());
 
-            excelHistory.slice(-10).reverse().forEach(entry => {
-                const listItem = document.createElement("li");
-                listItem.className = "history-item";
-                listItem.textContent = entry;
-                excelList.appendChild(listItem);
+                if (!isNaN(weeks)) {
+                    if (personWeeks[fullName]) {
+                        personWeeks[fullName] += weeks;
+                    } else {
+                        personWeeks[fullName] = weeks;
+                    }
+                }
             });
+
+            const teamTotals = {
+                "Équipe Rouge": 0,
+                "Équipe Vert": 0,
+                "Équipe Violet": 0
+            };
+
+            for (const person in personWeeks) {
+                for (const team in teamAssignments) {
+                    if (teamAssignments[team].includes(person)) {
+                        teamTotals[team] += personWeeks[person];
+                        break;
+                    }
+                }
+            }
+
+            document.getElementById("totalWeeksRed").textContent = teamTotals["Équipe Rouge"];
+            document.getElementById("totalWeeksGreen").textContent = teamTotals["Équipe Vert"];
+            document.getElementById("totalWeeksPurple").textContent = teamTotals["Équipe Violet"];
+
+            saveExcelHistory(excelText); // Enregistre dans l'historique
         }
 
-        // Historique des 3 derniers classements par équipe
-        function loadRankingHistory() {
-            const rankingHistory = JSON.parse(localStorage.getItem("rankingHistory") || "[]");
-            const rankingList = document.getElementById("rankingHistory");
-            rankingList.innerHTML = ""; // Vider la liste existante
-
-            rankingHistory.slice(-3).reverse().forEach(entry => {
-                const listItem = document.createElement("li");
-                listItem.className = "history-item";
-                listItem.textContent = entry;
-                rankingList.appendChild(listItem);
-            });
+        function saveValues() {
+            localStorage.setItem("weeksRed", document.getElementById("totalWeeksRed").textContent);
+            localStorage.setItem("weeksGreen", document.getElementById("totalWeeksGreen").textContent);
+            localStorage.setItem("weeksPurple", document.getElementById("totalWeeksPurple").textContent);
+            alert("Valeurs sauvegardées !");
         }
 
-        // Historique des 10 dernières mises à jour des Indices
-        function loadIndicesUpdateHistory() {
-            const indicesUpdateHistory = JSON.parse(localStorage.getItem("indicesUpdateHistory") || "[]");
-            const indicesList = document.getElementById("indicesUpdateHistory");
-            indicesList.innerHTML = ""; // Vider la liste existante
-
-            indicesUpdateHistory.slice(-10).reverse().forEach(entry => {
-                const listItem = document.createElement("li");
-                listItem.className = "history-item";
-                listItem.textContent = entry;
-                indicesList.appendChild(listItem);
-            });
+        function returnToMainPage() {
+            saveValues();
+            window.location.href = "index.html";
         }
 
-        // Mise à jour de la colonne Indices
         function updateIndices() {
             const team = document.getElementById("teamSelect").value;
             const newIndicesValue = parseInt(document.getElementById("newIndices").value);
@@ -163,17 +163,70 @@
                 return;
             }
 
-            // Sauvegarder la nouvelle valeur dans localStorage
             localStorage.setItem(`indices${team.charAt(0).toUpperCase() + team.slice(1)}`, newIndicesValue);
-            
-            // Mettre à jour l'historique des mises à jour des Indices
-            const indicesUpdateHistory = JSON.parse(localStorage.getItem("indicesUpdateHistory") || "[]");
-            indicesUpdateHistory.push(`${team} mis à jour à ${newIndicesValue} Indices`);
-            localStorage.setItem("indicesUpdateHistory", JSON.stringify(indicesUpdateHistory));
-
             alert(`Les Indices pour ${team} ont été mis à jour à ${newIndicesValue}.`);
-            loadIndicesUpdateHistory(); // Rafraîchir l'historique
+            saveIndicesUpdateHistory(`${team} mis à jour à ${newIndicesValue} Indices`);
+            loadIndicesUpdateHistory(); // Met à jour l'affichage
         }
+
+        function saveExcelHistory(data) {
+            let excelHistory = JSON.parse(localStorage.getItem("excelHistory") || "[]");
+            excelHistory.push(data);
+            if (excelHistory.length > 10) excelHistory = excelHistory.slice(-10); // Limite à 10 entrées
+            localStorage.setItem("excelHistory", JSON.stringify(excelHistory));
+            loadExcelHistory(); // Met à jour l'affichage
+        }
+
+        function saveIndicesUpdateHistory(update) {
+            let indicesUpdateHistory = JSON.parse(localStorage.getItem("indicesUpdateHistory") || "[]");
+            indicesUpdateHistory.push(update);
+            if (indicesUpdateHistory.length > 10) indicesUpdateHistory = indicesUpdateHistory.slice(-10); // Limite à 10 entrées
+            localStorage.setItem("indicesUpdateHistory", JSON.stringify(indicesUpdateHistory));
+        }
+
+        function loadHistories() {
+            loadExcelHistory();
+            loadRankingHistory();
+            loadIndicesUpdateHistory();
+        }
+
+        function loadExcelHistory() {
+            const excelHistory = JSON.parse(localStorage.getItem("excelHistory") || "[]");
+            const excelList = document.getElementById("excelHistory");
+            excelList.innerHTML = "";
+            excelHistory.reverse().forEach(entry => {
+                const listItem = document.createElement("li");
+                listItem.className = "history-item";
+                listItem.textContent = entry;
+                excelList.appendChild(listItem);
+            });
+        }
+
+        function loadRankingHistory() {
+            const rankingHistory = JSON.parse(localStorage.getItem("rankingHistory") || "[]");
+            const rankingList = document.getElementById("rankingHistory");
+            rankingList.innerHTML = "";
+            rankingHistory.slice(-3).reverse().forEach(entry => {
+                const listItem = document.createElement("li");
+                listItem.className = "history-item";
+                listItem.textContent = entry;
+                rankingList.appendChild(listItem);
+            });
+        }
+
+        function loadIndicesUpdateHistory() {
+            const indicesUpdateHistory = JSON.parse(localStorage.getItem("indicesUpdateHistory") || "[]");
+            const indicesList = document.getElementById("indicesUpdateHistory");
+            indicesList.innerHTML = "";
+            indicesUpdateHistory.reverse().forEach(entry => {
+                const listItem = document.createElement("li");
+                listItem.className = "history-item";
+                listItem.textContent = entry;
+                indicesList.appendChild(listItem);
+            });
+        }
+
+        window.onload = loadHistories;
     </script>
 </body>
 </html>
