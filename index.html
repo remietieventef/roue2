@@ -91,7 +91,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 675px; /* Taille réduite de 25% par rapport à 900px */
+            width: 675px; 
             height: 675px;
             margin: 20px auto 0;
             z-index: 5;
@@ -127,55 +127,38 @@
             border-radius: 5px;
             z-index: 10;
         }
-        .team-history {
-            margin-top: 20px;
-            display: flex;
-            gap: 20px;
-            width: 100%;
-            justify-content: center;
-        }
-        .team {
-            border: 1px solid #333;
-            padding: 10px;
-            border-radius: 5px;
-            width: 200px;
-            height: 150px;
-            background-color: rgba(255, 255, 255, 0.8);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #333;
-            overflow-y: auto;
-        }
-        .last-action {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-top: 20px;
-            color: #333;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 10px;
-            border-radius: 10px;
-            z-index: 10;
-        }
-        #stats-table {
+        /* Classement en temps réel */
+        #ranking {
             position: absolute;
+            left: 10px;
             top: 200px;
-            right: 50px;
-            border: 1px solid #333;
-            padding: 10px;
-            background-color: rgba(255, 255, 255, 0.8);
+            width: 200px;
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.7);
             border-radius: 5px;
-            color: #333;
+            color: #fff;
+            text-align: left;
+            font-size: 1.2em;
             z-index: 10;
+            animation: slideIn 1s ease;
         }
-        #stats-table table {
-            width: 100%;
-            border-collapse: collapse;
+        @keyframes slideIn {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
         }
-        #stats-table th, #stats-table td {
-            border: 1px solid #333;
-            padding: 5px;
-            text-align: center;
+        .rank-item {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .emoji {
+            font-size: 1.5em;
+            animation: bounce 1s infinite alternate;
+        }
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-5px); }
         }
     </style>
 </head>
@@ -192,6 +175,14 @@
         <a href="edit.html" target="_blank">Éditer les valeurs</a>
         <a href="edit_banner.html" target="_blank">Modifier la bannière</a>
         <a href="javascript:void(0)" onclick="clearHistory()">Effacer l'historique</a>
+    </div>
+
+    <!-- Classement en temps réel -->
+    <div id="ranking">
+        <h3>Classement</h3>
+        <div id="rankList">
+            <!-- Les éléments de classement apparaîtront ici -->
+        </div>
     </div>
 
     <!-- Sélection de l'équipe, placé juste en dessous de la bannière -->
@@ -260,53 +251,33 @@
     </div>
 
     <script>
-        function loadBanner() {
-            let bannerText = localStorage.getItem("bannerText") || "Bienvenue sur La roulette des secrets !";
-            document.getElementById("bannerText").textContent = bannerText;
+        // Récupération des données et classement en temps réel
+        function updateRanking() {
+            const teams = [
+                { name: "Équipe Rouge", score: parseInt(localStorage.getItem("weeksRed") || 0), emoji: "🔴" },
+                { name: "Équipe Vert", score: parseInt(localStorage.getItem("weeksGreen") || 0), emoji: "🟢" },
+                { name: "Équipe Violet", score: parseInt(localStorage.getItem("weeksPurple") || 0), emoji: "🟣" }
+            ];
 
-            // Vérifie et initialise le compte à rebours si {countdown} est présent
-            if (bannerText.includes("{countdown}")) {
-                const countdownTargetTime = getTargetTime();
-                setInterval(() => updateCountdown(countdownTargetTime), 1000);
-            }
+            teams.sort((a, b) => b.score - a.score);
+            
+            const rankList = document.getElementById("rankList");
+            rankList.innerHTML = ""; // Clear existing rankings
+            
+            teams.forEach(team => {
+                const rankItem = document.createElement("div");
+                rankItem.classList.add("rank-item");
+                rankItem.innerHTML = `${team.emoji} ${team.name} <span class="emoji">${team.score}</span>`;
+                rankList.appendChild(rankItem);
+            });
         }
 
-        // Récupère l'heure cible
-        function getTargetTime() {
-            const targetHour = parseInt(localStorage.getItem("targetHour") || "18", 10);
-            const targetMinute = parseInt(localStorage.getItem("targetMinute") || "0", 10);
-            const targetSecond = parseInt(localStorage.getItem("targetSecond") || "0", 10);
-
-            const now = new Date();
-            const targetTime = new Date(now);
-            targetTime.setHours(targetHour, targetMinute, targetSecond, 0);
-
-            if (now > targetTime) {
-                targetTime.setDate(targetTime.getDate() + 1);
-            }
-            return targetTime;
-        }
-
-        // Met à jour le décompte
-        function updateCountdown(targetTime) {
-            const now = new Date();
-            const diff = targetTime - now;
-
-            const hours = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0');
-            const minutes = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
-            const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
-
-            const countdownText = `${hours}h ${minutes}m ${seconds}s`;
-            document.getElementById("bannerText").textContent = localStorage.getItem("bannerText").replace("{countdown}", countdownText);
-        }
-
-        loadBanner();
-
-        function toggleAdminPopup() {
-            const popup = document.getElementById("adminPopup");
-            popup.style.display = popup.style.display === "none" || popup.style.display === "" ? "block" : "none";
-        }
-
+        // Update ranking on page load and whenever a score changes
+        window.onload = () => {
+            loadTableValues();
+            updateRanking();
+        };
+        
         function loadTableValues() {
             document.getElementById("weeksRed").textContent = localStorage.getItem("weeksRed") || "0";
             document.getElementById("indicesRed").textContent = localStorage.getItem("indicesRed") || "0";
@@ -314,63 +285,6 @@
             document.getElementById("indicesGreen").textContent = localStorage.getItem("indicesGreen") || "0";
             document.getElementById("weeksPurple").textContent = localStorage.getItem("weeksPurple") || "0";
             document.getElementById("indicesPurple").textContent = localStorage.getItem("indicesPurple") || "0";
-        }
-
-        window.onload = loadTableValues;
-
-        const segments = ["1 Indice", "1 Buzz", "2 Indices", "2 Buzz", "1 Indice", "1 Buzz", "2 Indices", "2 Buzz"];
-        const spinButton = document.getElementById('spinButton');
-        const wheel = document.getElementById('wheel');
-        const lastAction = document.getElementById('lastAction');
-        const teamSelect = document.getElementById('teamSelect');
-        const histories = {
-            teamRed: document.getElementById('historyRed'),
-            teamGreen: document.getElementById('historyGreen'),
-            teamPurple: document.getElementById('historyPurple')
-        };
-
-        function spinRoulette() {
-            spinButton.disabled = true;
-
-            const randomRotation = Math.floor(Math.random() * 360) + 1440;
-            wheel.style.transition = "transform 4s ease-out";
-            wheel.style.transform = `rotate(${randomRotation}deg)`;
-
-            setTimeout(() => {
-                const selectedSegmentIndex = Math.floor(((randomRotation % 360) / 45) + 0.5) % 8;
-                const result = segments[selectedSegmentIndex];
-
-                const selectedTeam = teamSelect.value;
-
-                const listItem = document.createElement('li');
-                listItem.textContent = result;
-                histories[selectedTeam].appendChild(listItem);
-
-                lastAction.textContent = `Dernière action : ${result}`;
-
-                alert(`Résultat pour ${selectedTeam}: ${result}`);
-
-                spinButton.disabled = false;
-            }, 4000);
-        }
-
-        spinButton.addEventListener('click', spinRoulette);
-
-        function showHistory(team) {
-            const history = histories[team];
-            let historyText = "Historique:\n";
-            history.querySelectorAll("li").forEach(item => {
-                historyText += `- ${item.textContent}\n`;
-            });
-            alert(historyText);
-        }
-
-        function clearHistory() {
-            for (let key in histories) {
-                histories[key].innerHTML = "";
-            }
-            lastAction.textContent = "Dernière action : ";
-            alert("Historique effacé !");
         }
     </script>
 </body>
