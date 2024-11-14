@@ -5,7 +5,208 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La roulette des secrets - Jeu d'équipe</title>
     <style>
-        /* Styles existants */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: url('Secret EF.jpg') no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
+            color: #fff;
+        }
+        #logo {
+            position: absolute;
+            top: 80px;
+            left: 10px;
+            width: 125px;
+            z-index: 10;
+        }
+        #banner {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: #ff4444;
+            color: #fff;
+            padding: 10px 0;
+            font-size: 1.5em;
+            text-align: center;
+            overflow: hidden;
+            white-space: nowrap;
+            z-index: 10;
+        }
+        #banner span {
+            display: inline-block;
+            animation: scrollBanner 10s linear infinite;
+        }
+        @keyframes scrollBanner {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        #adminButton {
+            position: fixed;
+            top: 50px;
+            right: 20px;
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            font-size: 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 15;
+        }
+        #adminPopup {
+            display: none;
+            position: fixed;
+            top: 100px;
+            right: 30px;
+            width: 200px;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            z-index: 15;
+        }
+        #adminPopup a {
+            display: block;
+            margin: 10px 0;
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        #teamSelectContainer {
+            margin-top: 60px;
+            text-align: center;
+        }
+        #teamSelect {
+            font-size: 1.5em;
+            padding: 10px;
+        }
+        /* Classement */
+        #ranking {
+            position: absolute;
+            left: 20px;
+            top: 150px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            width: 150px;
+            z-index: 10;
+            animation: popUp 1s ease-out;
+        }
+        #ranking h2 {
+            font-size: 1.2em;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .rank-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .rank-item span {
+            margin-left: 10px;
+        }
+        @keyframes popUp {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        #wheel-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 675px;
+            height: 675px;
+            margin: 20px auto 0;
+            z-index: 5;
+        }
+        #wheel {
+            width: 100%;
+            height: 100%;
+            background: url('Roue_sans_fond.1.png') no-repeat center center;
+            background-size: contain;
+            border-radius: 50%;
+            transition: transform 4s ease-out;
+            z-index: 5;
+        }
+        #indicator {
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            width: 20px;
+            height: 20px;
+            background-color: red;
+            clip-path: polygon(100% 50%, 0 0, 0 100%);
+            transform: translateY(-50%);
+            z-index: 6;
+        }
+        #spinButton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            z-index: 10;
+        }
+        .team-history {
+            margin-top: 20px;
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            justify-content: center;
+        }
+        .team {
+            border: 1px solid #333;
+            padding: 10px;
+            border-radius: 5px;
+            width: 200px;
+            height: 150px;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
+            overflow-y: auto;
+        }
+        .last-action {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #333;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 10px;
+            z-index: 10;
+        }
+        #stats-table {
+            position: absolute;
+            top: 200px;
+            right: 50px;
+            border: 1px solid #333;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            color: #333;
+            z-index: 10;
+        }
+        #stats-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #stats-table th, #stats-table td {
+            border: 1px solid #333;
+            padding: 5px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -31,7 +232,7 @@
         <a href="javascript:void(0)" onclick="clearHistory()">Effacer l'historique</a>
     </div>
 
-    <!-- Sélection de l'équipe -->
+    <!-- Sélection de l'équipe, placé juste en dessous de la bannière -->
     <div id="teamSelectContainer">
         <label for="teamSelect">Sélectionnez l'équipe :</label>
         <select id="teamSelect">
@@ -41,14 +242,14 @@
         </select>
     </div>
 
-    <!-- Roue avec l'indicateur -->
+    <!-- Roue avec l'indicateur à droite pour pointer le résultat -->
     <div id="wheel-container">
         <div id="wheel"></div>
         <div id="indicator"></div>
     </div>
     <button id="spinButton">Tourner</button>
 
-    <!-- Dernière action -->
+    <!-- Dernière action affichée en grand -->
     <div class="last-action" id="lastAction">Dernière action : </div>
 
     <!-- Historique des équipes -->
@@ -70,7 +271,7 @@
         </div>
     </div>
 
-    <!-- Tableau des statistiques -->
+    <!-- Tableau des statistiques, réintégré sur la droite de la roue -->
     <div id="stats-table">
         <table>
             <tr>
@@ -153,7 +354,6 @@
 
         window.onload = loadTableValues;
 
-        // Mise à jour des valeurs depuis localStorage sur changement
         window.addEventListener('storage', (event) => {
             if (['indicesRed', 'indicesGreen', 'indicesPurple', 'weeksRed', 'weeksGreen', 'weeksPurple'].includes(event.key)) {
                 loadTableValues();
@@ -239,4 +439,3 @@
     </script>
 </body>
 </html>
-
