@@ -349,10 +349,16 @@
             document.getElementById("indicesGreen").textContent = localStorage.getItem("indicesGreen") || "0";
             document.getElementById("weeksPurple").textContent = localStorage.getItem("weeksPurple") || "0";
             document.getElementById("indicesPurple").textContent = localStorage.getItem("indicesPurple") || "0";
-            updateRanking(); // Met à jour le classement dès le chargement
+            updateRanking();
         }
 
         window.onload = loadTableValues;
+
+        window.addEventListener('storage', (event) => {
+            if (['indicesRed', 'indicesGreen', 'indicesPurple', 'weeksRed', 'weeksGreen', 'weeksPurple'].includes(event.key)) {
+                loadTableValues();
+            }
+        });
 
         const segments = ["1 Indice", "1 Buzz", "2 Indices", "2 Buzz", "1 Indice", "1 Buzz", "2 Indices", "2 Buzz"];
         const spinButton = document.getElementById('spinButton');
@@ -387,7 +393,7 @@
                 alert(`Résultat pour ${selectedTeam}: ${result}`);
 
                 spinButton.disabled = false;
-                updateRanking(); // Met à jour le classement après chaque action
+                updateRanking();
             }, 4000);
         }
 
@@ -408,10 +414,9 @@
             }
             lastAction.textContent = "Dernière action : ";
             alert("Historique effacé !");
-            updateRanking(); // Met à jour le classement après effacement
+            updateRanking();
         }
 
-        // Classement
         function updateRanking() {
             const teams = [
                 { name: 'Équipe Rouge', points: parseInt(localStorage.getItem('indicesRed') || '0'), emoji: '🔥' },
@@ -419,10 +424,10 @@
                 { name: 'Équipe Violet', points: parseInt(localStorage.getItem('indicesPurple') || '0'), emoji: '💜' }
             ];
 
-            teams.sort((a, b) => b.points - a.points); // Tri par score
+            teams.sort((a, b) => b.points - a.points);
 
             const rankingList = document.getElementById('rankingList');
-            rankingList.innerHTML = ''; // Réinitialise la liste
+            rankingList.innerHTML = '';
 
             teams.forEach((team, index) => {
                 const rankItem = document.createElement('div');
