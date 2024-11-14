@@ -30,6 +30,13 @@
         .history-item {
             padding: 5px;
             border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+        }
+        .timestamp {
+            color: #888;
+            font-size: 0.8em;
         }
     </style>
 </head>
@@ -76,9 +83,9 @@
             </ul>
         </div>
 
-        <!-- Historique des 3 derniers classements par équipe -->
+        <!-- Historique des Résultats par équipe -->
         <div>
-            <h3>Derniers classements</h3>
+            <h3>Historique Résultats par équipe</h3>
             <ul id="rankingHistory" class="history-list">
                 <!-- Rempli par JavaScript -->
             </ul>
@@ -140,6 +147,7 @@
             document.getElementById("totalWeeksPurple").textContent = teamTotals["Équipe Violet"];
 
             saveExcelHistory(excelText); // Enregistre dans l'historique
+            saveRankingHistory(teamTotals); // Enregistre le résultat par équipe dans l'historique
         }
 
         function saveValues() {
@@ -166,22 +174,34 @@
             localStorage.setItem(`indices${team.charAt(0).toUpperCase() + team.slice(1)}`, newIndicesValue);
             alert(`Les Indices pour ${team} ont été mis à jour à ${newIndicesValue}.`);
             saveIndicesUpdateHistory(`${team} mis à jour à ${newIndicesValue} Indices`);
-            loadIndicesUpdateHistory(); // Met à jour l'affichage
+            loadIndicesUpdateHistory();
         }
 
         function saveExcelHistory(data) {
             let excelHistory = JSON.parse(localStorage.getItem("excelHistory") || "[]");
-            excelHistory.push(data);
-            if (excelHistory.length > 10) excelHistory = excelHistory.slice(-10); // Limite à 10 entrées
+            const timestamp = new Date().toLocaleString();
+            excelHistory.push({ data, timestamp });
+            if (excelHistory.length > 10) excelHistory = excelHistory.slice(-10);
             localStorage.setItem("excelHistory", JSON.stringify(excelHistory));
-            loadExcelHistory(); // Met à jour l'affichage
+            loadExcelHistory();
+        }
+
+        function saveRankingHistory(teamTotals) {
+            let rankingHistory = JSON.parse(localStorage.getItem("rankingHistory") || "[]");
+            const timestamp = new Date().toLocaleString();
+            rankingHistory.push({ teamTotals, timestamp });
+            if (rankingHistory.length > 3) rankingHistory = rankingHistory.slice(-3);
+            localStorage.setItem("rankingHistory", JSON.stringify(rankingHistory));
+            loadRankingHistory();
         }
 
         function saveIndicesUpdateHistory(update) {
             let indicesUpdateHistory = JSON.parse(localStorage.getItem("indicesUpdateHistory") || "[]");
-            indicesUpdateHistory.push(update);
-            if (indicesUpdateHistory.length > 10) indicesUpdateHistory = indicesUpdateHistory.slice(-10); // Limite à 10 entrées
+            const timestamp = new Date().toLocaleString();
+            indicesUpdateHistory.push({ update, timestamp });
+            if (indicesUpdateHistory.length > 10) indicesUpdateHistory = indicesUpdateHistory.slice(-10);
             localStorage.setItem("indicesUpdateHistory", JSON.stringify(indicesUpdateHistory));
+            loadIndicesUpdateHistory();
         }
 
         function loadHistories() {
@@ -197,7 +217,7 @@
             excelHistory.reverse().forEach(entry => {
                 const listItem = document.createElement("li");
                 listItem.className = "history-item";
-                listItem.textContent = entry;
+                listItem.innerHTML = `<span>${entry.data}</span> <span class="timestamp">${entry.timestamp}</span>`;
                 excelList.appendChild(listItem);
             });
         }
@@ -209,7 +229,7 @@
             rankingHistory.slice(-3).reverse().forEach(entry => {
                 const listItem = document.createElement("li");
                 listItem.className = "history-item";
-                listItem.textContent = entry;
+                listItem.innerHTML = `<span>${JSON.stringify(entry.teamTotals)}</span> <span class="timestamp">${entry.timestamp}</span>`;
                 rankingList.appendChild(listItem);
             });
         }
@@ -221,7 +241,7 @@
             indicesUpdateHistory.reverse().forEach(entry => {
                 const listItem = document.createElement("li");
                 listItem.className = "history-item";
-                listItem.textContent = entry;
+                listItem.innerHTML = `<span>${entry.update}</span> <span class="timestamp">${entry.timestamp}</span>`;
                 indicesList.appendChild(listItem);
             });
         }
@@ -230,3 +250,4 @@
     </script>
 </body>
 </html>
+
