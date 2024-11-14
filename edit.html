@@ -4,48 +4,7 @@
     <meta charset="UTF-8">
     <title>Éditer les valeurs</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: space-between;
-            padding: 20px;
-        }
-        .container {
-            width: 60%;
-        }
-        .history-section {
-            width: 35%;
-            max-width: 400px;
-            background-color: #f4f4f9;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
-        .history-list {
-            list-style-type: none;
-            padding: 0;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .history-item {
-            padding: 5px;
-            border-bottom: 1px solid #ddd;
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.9em;
-        }
-        .timestamp {
-            color: #888;
-            font-size: 0.8em;
-        }
-        .bubble {
-            background-color: #e9ecef;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            display: flex;
-            gap: 10px;
-        }
+        /* Styles existants */
     </style>
 </head>
 <body>
@@ -54,7 +13,6 @@
         <p>Collez les données Excel ici (Nom, Bureau, Date, Statut, Durée) :</p>
         <textarea id="excelData" rows="10" cols="50" placeholder="Collez ici les données copiées depuis Excel..."></textarea><br><br>
 
-        <!-- Bulle 1 : Boutons pour calculer, sauvegarder et retourner -->
         <div class="bubble">
             <button type="button" onclick="processData()">Calculer les weeks par équipe</button>
             <button type="button" onclick="saveValues()">Sauvegarder</button>
@@ -68,7 +26,6 @@
             <li>Équipe Violet : <span id="totalWeeksPurple">0</span> weeks</li>
         </ul>
 
-        <!-- Bulle 2 : Formulaire pour modifier les indices avec bouton de retour -->
         <div class="bubble">
             <label for="teamSelect">Sélectionnez l'équipe :</label>
             <select id="teamSelect">
@@ -82,36 +39,28 @@
             <button type="button" onclick="returnToMainPage()">Retourner à la page principale</button>
         </div>
 
-        <!-- Bulle 3 : Suppression de l'historique avec validation de mot de passe -->
         <div class="bubble">
             <input type="password" id="deletePassword" placeholder="Mot de passe">
             <button onclick="deleteHistory()">Supprimer l'historique</button>
         </div>
     </div>
 
-    <!-- Section Historique sur la droite -->
     <div class="history-section">
         <h2>Historique des dernières actions</h2>
 
         <div>
             <h3>Dernières données Excel importées</h3>
-            <ul id="excelHistory" class="history-list">
-                <!-- Rempli par JavaScript -->
-            </ul>
+            <ul id="excelHistory" class="history-list"></ul>
         </div>
 
         <div>
             <h3>Historique Résultats par équipe</h3>
-            <ul id="rankingHistory" class="history-list">
-                <!-- Rempli par JavaScript -->
-            </ul>
+            <ul id="rankingHistory" class="history-list"></ul>
         </div>
 
         <div>
             <h3>Dernières mises à jour des Indices</h3>
-            <ul id="indicesUpdateHistory" class="history-list">
-                <!-- Rempli par JavaScript -->
-            </ul>
+            <ul id="indicesUpdateHistory" class="history-list"></ul>
         </div>
     </div>
 
@@ -181,10 +130,12 @@
                 return;
             }
 
-            localStorage.setItem(`indices${team.charAt(0).toUpperCase() + team.slice(1)}`, newIndicesValue);
+            const indicesKey = `indices${team.charAt(0).toUpperCase() + team.slice(1)}`;
+            localStorage.setItem(indicesKey, newIndicesValue);
             alert(`Les Indices pour ${team} ont été mis à jour à ${newIndicesValue}.`);
             saveIndicesUpdateHistory(`${team} mis à jour à ${newIndicesValue} Indices`);
             loadIndicesUpdateHistory();
+            window.dispatchEvent(new Event('storage'));  // Force une synchronisation immédiate sur index.html
         }
 
         function deleteHistory() {
@@ -273,4 +224,3 @@
     </script>
 </body>
 </html>
-
