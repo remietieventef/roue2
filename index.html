@@ -5,178 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La roulette des secrets - Jeu d'équipe</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background: url('Secret EF.jpg') no-repeat center center fixed;
-            background-size: cover;
-            position: relative;
-            color: #fff;
-        }
-        #logo {
-            position: absolute;
-            top: 80px;
-            left: 10px;
-            width: 125px;
-            z-index: 10;
-        }
-        #banner {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background-color: #ff4444;
-            color: #fff;
-            padding: 10px 0;
-            font-size: 1.5em;
-            text-align: center;
-            overflow: hidden;
-            white-space: nowrap;
-            z-index: 10;
-        }
-        #banner span {
-            display: inline-block;
-            animation: scrollBanner 10s linear infinite;
-        }
-        @keyframes scrollBanner {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
-        #adminButton {
-            position: fixed;
-            top: 50px;
-            right: 20px;
-            background-color: #333;
-            color: #fff;
-            padding: 10px;
-            font-size: 14px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            z-index: 15;
-        }
-        #adminPopup {
-            display: none;
-            position: fixed;
-            top: 100px;
-            right: 30px;
-            width: 200px;
-            background-color: rgba(255, 255, 255, 0.9);
-            color: #333;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-            z-index: 15;
-        }
-        #adminPopup a {
-            display: block;
-            margin: 10px 0;
-            text-decoration: none;
-            color: #333;
-            font-weight: bold;
-        }
-        #teamSelectContainer {
-            margin-top: 60px;
-            text-align: center;
-        }
-        #teamSelect {
-            font-size: 1.5em;
-            padding: 10px;
-        }
-        #wheel-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 675px; /* Taille réduite de 25% par rapport à 900px */
-            height: 675px;
-            margin: 20px auto 0;
-            z-index: 5;
-        }
-        #wheel {
-            width: 100%;
-            height: 100%;
-            background: url('Roue_sans_fond.1.png') no-repeat center center;
-            background-size: contain;
-            border-radius: 50%;
-            transition: transform 4s ease-out;
-            z-index: 5;
-        }
-        #indicator {
-            position: absolute;
-            right: -20px;
-            top: 50%;
-            width: 20px;
-            height: 20px;
-            background-color: red;
-            clip-path: polygon(100% 50%, 0 0, 0 100%);
-            transform: translateY(-50%);
-            z-index: 6;
-        }
-        #spinButton {
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            background-color: #333;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            z-index: 10;
-        }
-        .team-history {
-            margin-top: 20px;
-            display: flex;
-            gap: 20px;
-            width: 100%;
-            justify-content: center;
-        }
-        .team {
-            border: 1px solid #333;
-            padding: 10px;
-            border-radius: 5px;
-            width: 200px;
-            height: 150px;
-            background-color: rgba(255, 255, 255, 0.8);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #333;
-            overflow-y: auto;
-        }
-        .last-action {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-top: 20px;
-            color: #333;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 10px;
-            border-radius: 10px;
-            z-index: 10;
-        }
-        #stats-table {
-            position: absolute;
-            top: 200px;
-            right: 50px;
-            border: 1px solid #333;
-            padding: 10px;
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 5px;
-            color: #333;
-            z-index: 10;
-        }
-        #stats-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        #stats-table th, #stats-table td {
-            border: 1px solid #333;
-            padding: 5px;
-            text-align: center;
-        }
+        /* Styles existants... */
     </style>
 </head>
 <body>
@@ -259,19 +88,44 @@
         </table>
     </div>
 
+    <!-- Ajoutez Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    
     <script>
-        function loadBanner() {
-            let bannerText = localStorage.getItem("bannerText") || "Bienvenue sur La roulette des secrets !";
+        // Configuration Supabase
+        const supabaseUrl = 'https://kooskprneulkenvzbbyq.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtvb2tzcHdybmV1bGtlbnZ6YmJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE1NzM5NTcsImV4cCI6MjA0NzE0OTk1N30.NY3LXLr2QxpvqQjZ9IXy5AnNZXlzVBEMbwebY-0FQuY';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Chargement de la bannière depuis Supabase
+        async function loadBanner() {
+            const { data, error } = await supabase
+                .from('settings')
+                .select('text')
+                .eq('id', 'banner')
+                .single();
+
+            const bannerText = data ? data.text : "Bienvenue sur La roulette des secrets !";
             document.getElementById("bannerText").textContent = bannerText;
 
-            // Vérifie et initialise le compte à rebours si {countdown} est présent
             if (bannerText.includes("{countdown}")) {
                 const countdownTargetTime = getTargetTime();
                 setInterval(() => updateCountdown(countdownTargetTime), 1000);
             }
         }
 
-        // Récupère l'heure cible
+        // Récupère les statistiques de chaque équipe depuis Supabase
+        async function loadTableValues() {
+            const { data: teams, error } = await supabase
+                .from('teams')
+                .select('team_name, weeks, indices');
+            
+            teams.forEach(team => {
+                document.getElementById(`weeks${team.team_name}`).textContent = team.weeks;
+                document.getElementById(`indices${team.team_name}`).textContent = team.indices;
+            });
+        }
+
         function getTargetTime() {
             const targetHour = parseInt(localStorage.getItem("targetHour") || "18", 10);
             const targetMinute = parseInt(localStorage.getItem("targetMinute") || "0", 10);
@@ -287,7 +141,6 @@
             return targetTime;
         }
 
-        // Met à jour le décompte
         function updateCountdown(targetTime) {
             const now = new Date();
             const diff = targetTime - now;
@@ -301,76 +154,19 @@
         }
 
         loadBanner();
+        loadTableValues();
 
         function toggleAdminPopup() {
             const popup = document.getElementById("adminPopup");
             popup.style.display = popup.style.display === "none" || popup.style.display === "" ? "block" : "none";
         }
 
-        function loadTableValues() {
-            document.getElementById("weeksRed").textContent = localStorage.getItem("weeksRed") || "0";
-            document.getElementById("indicesRed").textContent = localStorage.getItem("indicesRed") || "0";
-            document.getElementById("weeksGreen").textContent = localStorage.getItem("weeksGreen") || "0";
-            document.getElementById("indicesGreen").textContent = localStorage.getItem("indicesGreen") || "0";
-            document.getElementById("weeksPurple").textContent = localStorage.getItem("weeksPurple") || "0";
-            document.getElementById("indicesPurple").textContent = localStorage.getItem("indicesPurple") || "0";
-        }
-
-        window.onload = loadTableValues;
-
-        const segments = ["1 Indice", "1 Buzz", "2 Indices", "2 Buzz", "1 Indice", "1 Buzz", "2 Indices", "2 Buzz"];
-        const spinButton = document.getElementById('spinButton');
-        const wheel = document.getElementById('wheel');
-        const lastAction = document.getElementById('lastAction');
-        const teamSelect = document.getElementById('teamSelect');
-        const histories = {
-            teamRed: document.getElementById('historyRed'),
-            teamGreen: document.getElementById('historyGreen'),
-            teamPurple: document.getElementById('historyPurple')
-        };
-
-        function spinRoulette() {
-            spinButton.disabled = true;
-
-            const randomRotation = Math.floor(Math.random() * 360) + 1440;
-            wheel.style.transition = "transform 4s ease-out";
-            wheel.style.transform = `rotate(${randomRotation}deg)`;
-
-            setTimeout(() => {
-                const selectedSegmentIndex = Math.floor(((randomRotation % 360) / 45) + 0.5) % 8;
-                const result = segments[selectedSegmentIndex];
-
-                const selectedTeam = teamSelect.value;
-
-                const listItem = document.createElement('li');
-                listItem.textContent = result;
-                histories[selectedTeam].appendChild(listItem);
-
-                lastAction.textContent = `Dernière action : ${result}`;
-
-                alert(`Résultat pour ${selectedTeam}: ${result}`);
-
-                spinButton.disabled = false;
-            }, 4000);
-        }
-
-        spinButton.addEventListener('click', spinRoulette);
-
-        function showHistory(team) {
-            const history = histories[team];
-            let historyText = "Historique:\n";
-            history.querySelectorAll("li").forEach(item => {
-                historyText += `- ${item.textContent}\n`;
-            });
-            alert(historyText);
-        }
-
-        function clearHistory() {
-            for (let key in histories) {
-                histories[key].innerHTML = "";
-            }
-            lastAction.textContent = "Dernière action : ";
-            alert("Historique effacé !");
+        async function clearHistory() {
+            const { error } = await supabase
+                .from('histories')
+                .delete()
+                .neq('id', null); // Supprime tous les enregistrements
+            if (!error) alert("Historique effacé !");
         }
     </script>
 </body>
