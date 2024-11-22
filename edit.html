@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Éditer les valeurs</title>
-    <style>
+<meta charset="utf-8"/>
+<title>Éditer les valeurs</title>
+<style>
         body {
             font-family: Arial, sans-serif;
             display: flex;
@@ -49,227 +50,98 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Éditer les valeurs des équipes</h1>
-        <p>Collez les données Excel ici (Nom, Bureau, Date, Statut, Durée) :</p>
-        <textarea id="excelData" rows="10" cols="50" placeholder="Collez ici les données copiées depuis Excel..."></textarea><br><br>
+<div class="container">
+<h1>Éditer les valeurs des équipes</h1>
+<p>Collez les données Excel ici (Nom, Bureau, Date, Statut, Durée) :</p>
+<textarea cols="50" id="excelData" placeholder="Collez ici les données copiées depuis Excel..." rows="10"></textarea><br/><br/>
+<!-- Bulle 1 : Boutons pour calculer, sauvegarder et retourner -->
+<div class="bubble">
+<button onclick="processData()" type="button">Calculer les weeks par équipe</button>
+<button onclick="saveValues()" type="button">Sauvegarder</button>
+<button onclick="returnToMainPage()" type="button">Retourner à la page principale</button>
+</div>
+<h2>Résultats par équipe</h2>
+<ul id="resultsList"><li>Tino et ses dames : 0 weeks</li><li>Les tantis : 0 weeks</li><li>Les boss : 0 weeks</li><li>Girls Just Want to Have Money : 0 weeks</li><li>Les Agents (Presques) Secrets : 0 weeks</li><li>Bande Organisée : 0 weeks</li><li>Unbreakable : 0 weeks</li><li>Les tueurs en série : 0 weeks</li><li>Totally Spies : 0 weeks</li></ul>
+<!-- Bulle 2 : Formulaire pour modifier les indices avec bouton de retour -->
+<div class="bubble">
+<label for="teamSelect">Sélectionnez l'équipe :</label>
+<select id="teamSelect"><option value="Tino et ses dames">Tino et ses dames</option><option value="Les tantis">Les tantis</option><option value="Les boss">Les boss</option><option value="Girls Just Want to Have Money">Girls Just Want to Have Money</option><option value="Les Agents (Presques) Secrets">Les Agents (Presques) Secrets</option><option value="Bande Organisée">Bande Organisée</option><option value="Unbreakable">Unbreakable</option><option value="Les tueurs en série">Les tueurs en série</option><option value="Totally Spies">Totally Spies</option></select>
+<label for="newIndices">Nouvelle valeur d'Indices :</label>
+<input id="newIndices" placeholder="Entrez une nouvelle valeur d'Indices" type="number"/>
+<button onclick="updateIndices()">Mettre à jour les Indices</button>
+<button onclick="returnToMainPage()" type="button">Retourner à la page principale</button>
+</div>
+<!-- Bulle 3 : Suppression de l'historique avec validation de mot de passe -->
+<div class="bubble">
+<input id="deletePassword" placeholder="Mot de passe" type="password"/>
+<button onclick="deleteHistory()">Supprimer l'historique</button>
+</div>
+</div>
+<!-- Section Historique sur la droite -->
+<div class="history-section">
+<h2>Historique des dernières actions</h2>
+<div>
+<h3>Dernières données Excel importées</h3>
+<ul class="history-list" id="excelHistory">
+<!-- Rempli par JavaScript -->
+</ul>
+</div>
+<div>
+<h3>Historique Résultats par équipe</h3>
+<ul class="history-list" id="rankingHistory">
+<!-- Rempli par JavaScript -->
+</ul>
+</div>
+<div>
+<h3>Dernières mises à jour des Indices</h3>
+<ul class="history-list" id="indicesUpdateHistory">
+<!-- Rempli par JavaScript -->
+</ul>
+</div>
+</div>
+<script>
+    const teamAssignments = {'Tino et ses dames': ['Tino Babel', 'Clara Piel', 'KARNY HARBOYAN', 'Valentin Bonhomme'], 'Les tantis': ['Leylia Michel', 'Adélie Fertre', 'Morgan Olichet', 'Jeremy Thanh', 'Sulyvan Alves'], 'Les boss': ['Manon Sauvayre', 'Estelle Alonso', 'Leila Amrane', 'Axel Waymel'], 'Girls Just Want to Have Money': ['Manon Bertin', 'Alexandra Paas', 'Noemie Sablong', 'Chloe Vogt'], 'Les Agents (Presques) Secrets': ['Tess Noublanche', 'Louis Deconinck', 'Emma Coquelle'], 'Bande Organisée': ['Jules Field', 'Chloe Lathouche', 'Bruno Dias', 'Florian Saint Blancat'], 'Unbreakable': ['Pierre Lietaert', 'Nathan Turcaud', 'Yasmina Al ghannoufi', 'Vanguelis Chadjichristos'], 'Les tueurs en série': ['Emma Leclerre', 'Charlotte Delnatte', 'Lorenzo Maestro', 'Fanny Gineys', 'Tom Sarfati'], 'Totally Spies': ['Hugo Benedetti', 'Clement CHAMINADE', 'Camélia Kermiche', 'Elisa GONNET']};
 
-        <!-- Bulle 1 : Boutons pour calculer, sauvegarder et retourner -->
-        <div class="bubble">
-            <button type="button" onclick="processData()">Calculer les weeks par équipe</button>
-            <button type="button" onclick="saveValues()">Sauvegarder</button>
-            <button type="button" onclick="returnToMainPage()">Retourner à la page principale</button>
-        </div>
+    function processData() {
+        const excelText = document.getElementById("excelData").value.trim();
+        const rows = excelText.split("\n");
+        const teamDurations = {};
 
-        <h2>Résultats par équipe</h2>
-        <ul>
-            <li>Équipe Rouge : <span id="totalWeeksRed">0</span> weeks</li>
-            <li>Équipe Vert : <span id="totalWeeksGreen">0</span> weeks</li>
-            <li>Équipe Violet : <span id="totalWeeksPurple">0</span> weeks</li>
-        </ul>
+        // Initialize durations
+        for (let team in teamAssignments) {
+            teamDurations[team] = 0;
+        }
 
-        <!-- Bulle 2 : Formulaire pour modifier les indices avec bouton de retour -->
-        <div class="bubble">
-            <label for="teamSelect">Sélectionnez l'équipe :</label>
-            <select id="teamSelect">
-                <option value="teamRed">Équipe Rouge</option>
-                <option value="teamGreen">Équipe Vert</option>
-                <option value="teamPurple">Équipe Violet</option>
-            </select>
-            <label for="newIndices">Nouvelle valeur d'Indices :</label>
-            <input type="number" id="newIndices" placeholder="Entrez une nouvelle valeur d'Indices">
-            <button onclick="updateIndices()">Mettre à jour les Indices</button>
-            <button type="button" onclick="returnToMainPage()">Retourner à la page principale</button>
-        </div>
+        rows.forEach(row => {
+            const columns = row.split("\t");
+            const fullName = columns[2]?.trim(); // "Sales Made by: Full Name"
+            const duration = parseInt(columns[8]?.trim()); // "Duration"
 
-        <!-- Bulle 3 : Suppression de l'historique avec validation de mot de passe -->
-        <div class="bubble">
-            <input type="password" id="deletePassword" placeholder="Mot de passe">
-            <button onclick="deleteHistory()">Supprimer l'historique</button>
-        </div>
-    </div>
-
-    <!-- Section Historique sur la droite -->
-    <div class="history-section">
-        <h2>Historique des dernières actions</h2>
-
-        <div>
-            <h3>Dernières données Excel importées</h3>
-            <ul id="excelHistory" class="history-list">
-                <!-- Rempli par JavaScript -->
-            </ul>
-        </div>
-
-        <div>
-            <h3>Historique Résultats par équipe</h3>
-            <ul id="rankingHistory" class="history-list">
-                <!-- Rempli par JavaScript -->
-            </ul>
-        </div>
-
-        <div>
-            <h3>Dernières mises à jour des Indices</h3>
-            <ul id="indicesUpdateHistory" class="history-list">
-                <!-- Rempli par JavaScript -->
-            </ul>
-        </div>
-    </div>
-
-    <script>
-        const teamAssignments = {
-            "Équipe Rouge": ["Adlene Chanegriha", "Margot Guillard"],
-            "Équipe Vert": ["Alexa Coutant", "Maxime Bienne"],
-            "Équipe Violet": ["Elisa Lombe", "Lisa Deroy"]
-        };
-
-        function processData() {
-            const excelText = document.getElementById("excelData").value;
-            const rows = excelText.trim().split("\n");
-            const personWeeks = {};
-
-            rows.forEach(row => {
-                const columns = row.split("\t");
-                const fullName = columns[0].trim();
-                const weeks = parseInt(columns[4].trim());
-
-                if (!isNaN(weeks)) {
-                    personWeeks[fullName] = (personWeeks[fullName] || 0) + weeks;
-                }
-            });
-
-            const teamTotals = {
-                "Équipe Rouge": 0,
-                "Équipe Vert": 0,
-                "Équipe Violet": 0
-            };
-
-            for (const person in personWeeks) {
-                for (const team in teamAssignments) {
-                    if (teamAssignments[team].includes(person)) {
-                        teamTotals[team] += personWeeks[person];
+            if (fullName && !isNaN(duration)) {
+                for (let team in teamAssignments) {
+                    if (teamAssignments[team].includes(fullName)) {
+                        teamDurations[team] += duration;
                         break;
                     }
                 }
             }
+        });
 
-            document.getElementById("totalWeeksRed").textContent = teamTotals["Équipe Rouge"];
-            document.getElementById("totalWeeksGreen").textContent = teamTotals["Équipe Vert"];
-            document.getElementById("totalWeeksPurple").textContent = teamTotals["Équipe Violet"];
-
-            saveExcelHistory(excelText);
-            saveRankingHistory(teamTotals);
+        // Update localStorage for durations
+        for (let team in teamDurations) {
+            localStorage.setItem(`duration_$Totally_Spies`, teamDurations[team]);
         }
 
-        function saveValues() {
-            localStorage.setItem("weeksRed", document.getElementById("totalWeeksRed").textContent);
-            localStorage.setItem("weeksGreen", document.getElementById("totalWeeksGreen").textContent);
-            localStorage.setItem("weeksPurple", document.getElementById("totalWeeksPurple").textContent);
-            alert("Valeurs sauvegardées !");
+        // Update UI to reflect new durations
+        const resultsList = document.getElementById("resultsList");
+        resultsList.innerHTML = "";
+        for (let team in teamDurations) {
+            const li = document.createElement("li");
+            li.textContent = `${team} : ${teamDurations[team]} weeks`;
+            resultsList.appendChild(li);
         }
-
-        function returnToMainPage() {
-            saveValues();
-            window.location.href = "index.html";
-        }
-
-        function updateIndices() {
-            const team = document.getElementById("teamSelect").value;
-            const newIndicesValue = parseInt(document.getElementById("newIndices").value);
-
-            if (isNaN(newIndicesValue)) {
-                alert("Veuillez entrer une valeur valide pour les Indices.");
-                return;
-            }
-
-            localStorage.setItem(`indices${team.charAt(0).toUpperCase() + team.slice(1)}`, newIndicesValue);
-            alert(`Les Indices pour ${team} ont été mis à jour à ${newIndicesValue}.`);
-            saveIndicesUpdateHistory(`${team} mis à jour à ${newIndicesValue} Indices`);
-            loadIndicesUpdateHistory();
-        }
-
-        function deleteHistory() {
-            const password = document.getElementById("deletePassword").value;
-            if (password === "WeLoveILSY") {
-                localStorage.removeItem("excelHistory");
-                localStorage.removeItem("rankingHistory");
-                localStorage.removeItem("indicesUpdateHistory");
-                alert("Historique supprimé !");
-                loadHistories();
-            } else {
-                alert("Mot de passe incorrect !");
-            }
-        }
-
-        function saveExcelHistory(data) {
-            let excelHistory = JSON.parse(localStorage.getItem("excelHistory") || "[]");
-            const timestamp = new Date().toLocaleString();
-            excelHistory.push({ data, timestamp });
-            if (excelHistory.length > 10) excelHistory = excelHistory.slice(-10);
-            localStorage.setItem("excelHistory", JSON.stringify(excelHistory));
-            loadExcelHistory();
-        }
-
-        function saveRankingHistory(teamTotals) {
-            let rankingHistory = JSON.parse(localStorage.getItem("rankingHistory") || "[]");
-            const timestamp = new Date().toLocaleString();
-            rankingHistory.push({ teamTotals, timestamp });
-            if (rankingHistory.length > 3) rankingHistory = rankingHistory.slice(-3);
-            localStorage.setItem("rankingHistory", JSON.stringify(rankingHistory));
-            loadRankingHistory();
-        }
-
-        function saveIndicesUpdateHistory(update) {
-            let indicesUpdateHistory = JSON.parse(localStorage.getItem("indicesUpdateHistory") || "[]");
-            const timestamp = new Date().toLocaleString();
-            indicesUpdateHistory.push({ update, timestamp });
-            if (indicesUpdateHistory.length > 10) indicesUpdateHistory = indicesUpdateHistory.slice(-10);
-            localStorage.setItem("indicesUpdateHistory", JSON.stringify(indicesUpdateHistory));
-            loadIndicesUpdateHistory();
-        }
-
-        function loadHistories() {
-            loadExcelHistory();
-            loadRankingHistory();
-            loadIndicesUpdateHistory();
-        }
-
-        function loadExcelHistory() {
-            const excelHistory = JSON.parse(localStorage.getItem("excelHistory") || "[]");
-            const excelList = document.getElementById("excelHistory");
-            excelList.innerHTML = "";
-            excelHistory.reverse().forEach(entry => {
-                const listItem = document.createElement("li");
-                listItem.className = "history-item";
-                listItem.innerHTML = `<span>${entry.data}</span> <span class="timestamp">${entry.timestamp}</span>`;
-                excelList.appendChild(listItem);
-            });
-        }
-
-        function loadRankingHistory() {
-            const rankingHistory = JSON.parse(localStorage.getItem("rankingHistory") || "[]");
-            const rankingList = document.getElementById("rankingHistory");
-            rankingList.innerHTML = "";
-            rankingHistory.slice(-3).reverse().forEach(entry => {
-                const listItem = document.createElement("li");
-                listItem.className = "history-item";
-                listItem.innerHTML = `<span>${JSON.stringify(entry.teamTotals)}</span> <span class="timestamp">${entry.timestamp}</span>`;
-                rankingList.appendChild(listItem);
-            });
-        }
-
-        function loadIndicesUpdateHistory() {
-            const indicesUpdateHistory = JSON.parse(localStorage.getItem("indicesUpdateHistory") || "[]");
-            const indicesList = document.getElementById("indicesUpdateHistory");
-            indicesList.innerHTML = "";
-            indicesUpdateHistory.reverse().forEach(entry => {
-                const listItem = document.createElement("li");
-                listItem.className = "history-item";
-                listItem.innerHTML = `<span>${entry.update}</span> <span class="timestamp">${entry.timestamp}</span>`;
-                indicesList.appendChild(listItem);
-            });
-        }
-
-        window.onload = loadHistories;
+        alert("Durations updated for all teams!");
+    }
     </script>
 </body>
 </html>
