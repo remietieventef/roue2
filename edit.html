@@ -140,8 +140,39 @@
             li.textContent = `${team} : ${teamDurations[team]} weeks`;
             resultsList.appendChild(li);
         }
+        saveRankingHistory(teamDurations);
         alert("Durations updated for all teams!");
     }
+
+    function saveValues() {
+        alert("Values saved and ready for index.html!");
+        window.location.href = "index.html";  // Redirect to the main page
+    }
+
+    // Save ranking history to localStorage for historical display
+    function saveRankingHistory(teamDurations) {
+        let rankingHistory = JSON.parse(localStorage.getItem("rankingHistory") || "[]");
+        const timestamp = new Date().toLocaleString();
+        rankingHistory.push({ teamDurations, timestamp });
+        if (rankingHistory.length > 10) rankingHistory = rankingHistory.slice(-10); // Limit to 10 entries
+        localStorage.setItem("rankingHistory", JSON.stringify(rankingHistory));
+        loadRankingHistory();
+    }
+
+    // Load ranking history on the page
+    function loadRankingHistory() {
+        const rankingHistory = JSON.parse(localStorage.getItem("rankingHistory") || "[]");
+        const rankingList = document.getElementById("rankingHistory");
+        rankingList.innerHTML = "";
+        rankingHistory.reverse().forEach(entry => {
+            const listItem = document.createElement("li");
+            listItem.className = "history-item";
+            listItem.innerHTML = `<span>${JSON.stringify(entry.teamDurations)}</span> <span class="timestamp">${entry.timestamp}</span>`;
+            rankingList.appendChild(listItem);
+        });
+    }
+
+    window.onload = loadRankingHistory;
     </script>
 </body>
 </html>
