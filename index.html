@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>La roulette des secrets - Jeu d'équipe</title>
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>La roulette des secrets - Jeu d'équipe</title>
+<style>
         body {
             font-family: Arial, sans-serif;
             display: flex;
@@ -210,94 +211,43 @@
     </style>
 </head>
 <body>
-    <!-- Logo EF Education First -->
-    <img id="logo" src="EF-Logo-Sans-Fond.png" alt="EF Education First Logo">
+<!-- Logo EF Education First -->
+<img alt="EF Education First Logo" id="logo" src="EF-Logo-Sans-Fond.png"/>
+<!-- Bannière dynamique -->
+<div id="banner"><span id="bannerText">Bienvenue sur La roulette des secrets !</span></div>
+<!-- Classement -->
 
-    <!-- Bannière dynamique -->
-    <div id="banner"><span id="bannerText">Bienvenue sur La roulette des secrets !</span></div>
+<!-- Bouton Admin -->
+<button id="adminButton" onclick="toggleAdminPopup()">Admin</button>
+<div id="adminPopup">
+<a href="edit.html" target="_blank">Éditer les valeurs</a>
+<a href="edit_banner.html" target="_blank">Modifier la bannière</a>
+<a href="javascript:void(0)" onclick="clearHistory()">Effacer l'historique</a>
+</div><div id="rouletteHistory" style="display: none;">No roulette history yet.</div>
+<!-- Sélection de l'équipe, placé juste en dessous de la bannière -->
+<div id="teamSelectContainer">
+<label for="teamSelect">Sélectionnez l'équipe :</label>
+<select id="teamSelect"><option value="Tino et ses dames">Tino et ses dames</option><option value="Les tantis">Les tantis</option><option value="Les boss">Les boss</option><option value="Girls Just Want to Have Money">Girls Just Want to Have Money</option><option value="Les Agents (Presques) Secrets">Les Agents (Presques) Secrets</option><option value="Bande Organisée">Bande Organisée</option><option value="Unbreakable">Unbreakable</option><option value="Les tueurs en série">Les tueurs en série</option><option value="Totally Spies">Totally Spies</option></select>
+</div>
+<!-- Roue avec l'indicateur à droite pour pointer le résultat -->
+<div id="wheel-container">
+<div id="wheel"></div>
+<div id="indicator"></div>
+</div>
+<button id="spinButton">Tourner</button>
+<!-- Dernière action affichée en grand -->
+<div class="last-action" id="lastAction">Dernière action : </div>
+<!-- Historique des équipes -->
+<div class="team-history">
 
-    <!-- Classement -->
-    <div id="ranking">
-        <h2>Classement 🎉</h2>
-        <div id="rankingList">
-            <!-- Les équipes seront affichées ici -->
-        </div>
-    </div>
 
-    <!-- Bouton Admin -->
-    <button id="adminButton" onclick="toggleAdminPopup()">Admin</button>
-    <div id="adminPopup">
-        <a href="edit.html" target="_blank">Éditer les valeurs</a>
-        <a href="edit_banner.html" target="_blank">Modifier la bannière</a>
-        <a href="javascript:void(0)" onclick="clearHistory()">Effacer l'historique</a>
-    </div>
 
-    <!-- Sélection de l'équipe, placé juste en dessous de la bannière -->
-    <div id="teamSelectContainer">
-        <label for="teamSelect">Sélectionnez l'équipe :</label>
-        <select id="teamSelect">
-            <option value="teamRed">Équipe Rouge</option>
-            <option value="teamGreen">Équipe Vert</option>
-            <option value="teamPurple">Équipe Violet</option>
-        </select>
-    </div>
-
-    <!-- Roue avec l'indicateur à droite pour pointer le résultat -->
-    <div id="wheel-container">
-        <div id="wheel"></div>
-        <div id="indicator"></div>
-    </div>
-    <button id="spinButton">Tourner</button>
-
-    <!-- Dernière action affichée en grand -->
-    <div class="last-action" id="lastAction">Dernière action : </div>
-
-    <!-- Historique des équipes -->
-    <div class="team-history">
-        <div class="team" id="teamRed">
-            <h3>Équipe Rouge</h3>
-            <ul class="history" id="historyRed"></ul>
-            <button onclick="showHistory('teamRed')">Afficher l'historique</button>
-        </div>
-        <div class="team" id="teamGreen">
-            <h3>Équipe Vert</h3>
-            <ul class="history" id="historyGreen"></ul>
-            <button onclick="showHistory('teamGreen')">Afficher l'historique</button>
-        </div>
-        <div class="team" id="teamPurple">
-            <h3>Équipe Violet</h3>
-            <ul class="history" id="historyPurple"></ul>
-            <button onclick="showHistory('teamPurple')">Afficher l'historique</button>
-        </div>
-    </div>
-
-    <!-- Tableau des statistiques, réintégré sur la droite de la roue -->
-    <div id="stats-table">
-        <table>
-            <tr>
-                <th>Équipe</th>
-                <th>Nombre de weeks</th>
-                <th>Indices</th>
-            </tr>
-            <tr>
-                <td>Équipe Rouge</td>
-                <td id="weeksRed">0</td>
-                <td id="indicesRed">0</td>
-            </tr>
-            <tr>
-                <td>Équipe Vert</td>
-                <td id="weeksGreen">0</td>
-                <td id="indicesGreen">0</td>
-            </tr>
-            <tr>
-                <td>Équipe Violet</td>
-                <td id="weeksPurple">0</td>
-                <td id="indicesPurple">0</td>
-            </tr>
-        </table>
-    </div>
-
-    <script>
+</div>
+<!-- Tableau des statistiques, réintégré sur la droite de la roue -->
+<div id="stats-table">
+<table><tr><th string="Équipe"></th><th string="Nombre de weeks"></th></tr><tr><td>Tino et ses dames</td><td id="weeks_Tino_et_ses_dames">0</td></tr><tr><td>Les tantis</td><td id="weeks_Les_tantis">0</td></tr><tr><td>Les boss</td><td id="weeks_Les_boss">0</td></tr><tr><td>Girls Just Want to Have Money</td><td id="weeks_Girls_Just_Want_to_Have_Money">0</td></tr><tr><td>Les Agents (Presques) Secrets</td><td id="weeks_Les_Agents_(Presques)_Secrets">0</td></tr><tr><td>Bande Organisée</td><td id="weeks_Bande_Organisée">0</td></tr><tr><td>Unbreakable</td><td id="weeks_Unbreakable">0</td></tr><tr><td>Les tueurs en série</td><td id="weeks_Les_tueurs_en_série">0</td></tr><tr><td>Totally Spies</td><td id="weeks_Totally_Spies">0</td></tr></table>
+</div>
+<script>
         function loadBanner() {
             let bannerText = localStorage.getItem("bannerText") || "Bienvenue sur La roulette des secrets !";
             document.getElementById("bannerText").textContent = bannerText;
@@ -436,6 +386,32 @@
                 rankingList.appendChild(rankItem);
             });
         }
-    </script>
+    
+        const rouletteHistory = [];
+
+        function addRouletteHistory(team, result) {
+            const timestamp = new Date().toLocaleString();
+            rouletteHistory.push({ team, result, timestamp });
+            if (rouletteHistory.length > 10) rouletteHistory.shift(); // Keep only the last 10 entries
+        }
+
+        function showRouletteHistory() {
+            const historyDiv = document.getElementById("rouletteHistory");
+            historyDiv.innerHTML = "";
+            rouletteHistory.forEach(entry => {
+                const p = document.createElement("p");
+                p.textContent = `[${entry.timestamp}] Team: ${entry.team}, Result: ${entry.result}`;
+                historyDiv.appendChild(p);
+            });
+            alert(historyDiv.innerHTML);
+        }
+
+        function spinRoulette() {
+            const selectedTeam = document.getElementById("teamSelect").value;
+            const result = "Your Result Here"; // Replace with logic to get the roulette result
+            addRouletteHistory(selectedTeam, result);
+            alert(`Result for ${selectedTeam}: ${result}`); // Pop-up for the result
+        }
+        </script>
 </body>
 </html>
