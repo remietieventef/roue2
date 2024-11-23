@@ -219,11 +219,11 @@
 
 <!-- Bouton Admin -->
 <button id="adminButton" onclick="toggleAdminPopup()">Admin</button>
-<div id="adminPopup">
-<a href="edit.html" target="_blank">Éditer les valeurs</a>
-<a href="edit_banner.html" target="_blank">Modifier la bannière</a>
-<a href="javascript:void(0)" onclick="clearHistory()">Effacer l'historique</a>
-</div><div id="rouletteHistory" style="display: none;">No roulette history yet.</div>
+<div id="adminPopup" style="display: none; position: fixed; top: 100px; right: 30px; background-color: rgba(255,255,255,0.9); padding: 15px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.5);">
+    <a href="edit.html" target="_blank" style="display: block; margin: 10px 0; color: #333; font-weight: bold; text-decoration: none;">Éditer les valeurs</a>
+    <a href="edit_banner.html" target="_blank" style="display: block; margin: 10px 0; color: #333; font-weight: bold; text-decoration: none;">Modifier la bannière</a>
+    <a href="javascript:void(0)" onclick="clearHistory()" style="display: block; margin: 10px 0; color: #333; font-weight: bold; text-decoration: none;">Effacer l'historique</a>
+</div>
 <!-- Sélection de l'équipe, placé juste en dessous de la bannière -->
 <div id="teamSelectContainer">
 <label for="teamSelect">Sélectionnez l'équipe :</label>
